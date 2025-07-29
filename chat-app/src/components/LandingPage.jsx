@@ -10,7 +10,9 @@ const LandingPage = () => {
   const testConnection = async () => {
     try {
       console.log('Testing API connection...')
-      const response = await fetch('http://localhost:5000/api/health')
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+      const healthUrl = API_BASE_URL.replace('/api', '') + '/api/health'
+      const response = await fetch(healthUrl)
       const data = await response.json()
       console.log('API Health Check:', data)
       alert(`API Connection: ${data.status} - ${data.message}`)

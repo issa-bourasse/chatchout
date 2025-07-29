@@ -52,7 +52,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chatflow')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chatchout')
 .then(() => {
   console.log('✅ Connected to MongoDB');
 })
