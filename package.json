@@ -1,0 +1,30 @@
+{
+  "name": "chatflow-mern-app",
+  "version": "1.0.0",
+  "description": "A modern MERN stack chat application with real-time messaging",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd chat-app && npm run dev",
+    "build": "cd chat-app && npm run build",
+    "start": "cd server && npm start",
+    "install-server": "cd server && npm install",
+    "install-client": "cd chat-app && npm install",
+    "install-all": "npm run install-server && npm run install-client"
+  },
+  "keywords": [
+    "mern",
+    "chat",
+    "real-time",
+    "socket.io",
+    "react",
+    "node.js",
+    "mongodb",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
