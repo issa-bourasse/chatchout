@@ -68,7 +68,7 @@ app.use('/api/video-calls', videoCallRoutes);
 app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
-    message: 'ChatFlow server is running',
+    message: 'ChatChout server is running',
     timestamp: new Date().toISOString()
   });
 });

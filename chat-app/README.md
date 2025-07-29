@@ -1,4 +1,4 @@
-# ChatFlow - Modern Chat Application
+# ChatChout - Modern Chat Application
 
 A beautiful, responsive chat application built with React, Vite, and Tailwind CSS 4.0.
 

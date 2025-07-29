@@ -1,4 +1,4 @@
-# ChatFlow Development Guide
+# ChatChout Development Guide
 
 ## 🏗️ Project Structure Overview
 
@@ -56,7 +56,7 @@ npm run install-all
 ```env
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/chatflow
+MONGODB_URI=mongodb://localhost:27017/chatchout
 JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRE=7d
 CLIENT_URL=http://localhost:5173
@@ -145,7 +145,7 @@ server/
 
 ### Database Management
 - MongoDB runs on default port 27017
-- Database name: `chatflow`
+- Database name: `chatchout`
 - Users are created through the registration process
 
 ## 🛠️ Common Development Tasks

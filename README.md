@@ -1,4 +1,4 @@
-# ChatFlow - MERN Stack Chat Application
+# ChatChout - MERN Stack Chat Application
 
 A modern, real-time chat application built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring friend systems, group chats, and real-time messaging.
 
@@ -126,7 +126,7 @@ FinalProject/
    ```env
    PORT=5000
    NODE_ENV=development
-   MONGODB_URI=mongodb://localhost:27017/chatflow
+   MONGODB_URI=mongodb://localhost:27017/chatchout
    JWT_SECRET=your_super_secret_jwt_key_here
    JWT_EXPIRE=7d
    CLIENT_URL=http://localhost:5173

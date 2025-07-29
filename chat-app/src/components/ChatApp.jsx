@@ -1599,7 +1599,7 @@ const ChatApp = () => {
 
             <div className="text-center animate-fade-in">
               <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-pulse" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Welcome to ChatFlow</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Welcome to ChatChout</h3>
               <p className="text-gray-600">Select a conversation to start messaging</p>
               <button
                 onClick={() => setIsSidebarOpen(true)}
