@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "name": "chatchout-backend",
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "MONGODB_URI": "@mongodb_uri",
+    "JWT_SECRET": "@jwt_secret",
+    "JWT_EXPIRE": "@jwt_expire",
+    "CLIENT_URL": "@client_url",
+    "STREAM_API_KEY": "@stream_api_key",
+    "STREAM_API_SECRET": "@stream_api_secret"
+  },
+  "functions": {
+    "server.js": {
+      "maxDuration": 30
+    }
+  }
+}

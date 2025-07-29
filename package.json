@@ -7,10 +7,13 @@
     "server": "cd server && npm run dev",
     "client": "cd chat-app && npm run dev",
     "build": "cd chat-app && npm run build",
+    "build:production": "cd chat-app && npm run build:production",
     "start": "cd server && npm start",
     "install-server": "cd server && npm install",
     "install-client": "cd chat-app && npm install",
-    "install-all": "npm run install-server && npm run install-client"
+    "install-all": "npm run install-server && npm run install-client",
+    "deploy:frontend": "cd chat-app && vercel --prod",
+    "deploy:backend": "cd server && vercel --prod"
   },
   "keywords": [
     "mern",
