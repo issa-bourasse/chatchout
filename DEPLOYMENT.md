@@ -38,17 +38,17 @@ chatchout/
    - Framework Preset: "Other"
 
 3. **Configure Environment Variables**
-   Add these environment variables in Vercel dashboard:
+   In Vercel dashboard, go to Project Settings → Environment Variables and add:
 
-   ```env
-   NODE_ENV=production
-   MONGODB_URI=mongodb+srv://admin:YOUR_PASSWORD@cluster0.sbge678.mongodb.net/chatchout?retryWrites=true&w=majority&appName=Cluster0
-   JWT_SECRET=your_super_secure_jwt_secret_here_at_least_32_characters
-   JWT_EXPIRE=7d
-   CLIENT_URL=https://your-frontend-domain.vercel.app
-   STREAM_API_KEY=your_stream_api_key
-   STREAM_API_SECRET=your_stream_api_secret
-   ```
+   **Key:** `NODE_ENV` **Value:** `production`
+   **Key:** `MONGODB_URI` **Value:** `mongodb+srv://admin:admin12345$@cluster0.sbge678.mongodb.net/chatchout?retryWrites=true&w=majority&appName=Cluster0`
+   **Key:** `JWT_SECRET` **Value:** `your_super_secure_jwt_secret_here_at_least_32_characters_long`
+   **Key:** `JWT_EXPIRE` **Value:** `7d`
+   **Key:** `CLIENT_URL` **Value:** `https://your-frontend-domain.vercel.app`
+   **Key:** `STREAM_API_KEY` **Value:** `twe26yayd39n`
+   **Key:** `STREAM_API_SECRET` **Value:** `your_stream_secret_here`
+
+   ⚠️ **Important:** Add each variable individually in the Vercel dashboard, don't use @ references.
 
 4. **Deploy**
    - Click "Deploy"
@@ -82,8 +82,8 @@ After backend deployment, update the CORS configuration in `server/server.js` if
 1. **Create New Project**
    - Go to Vercel Dashboard
    - Click "New Project"
-   - Import your repository
-   - Choose "chat-app" folder as root directory
+   - Import your repository: `cheimabarhoumi/chatchout`
+   - **IMPORTANT:** Set Root Directory to `chat-app`
    - Framework Preset: "Vite"
 
 2. **Configure Build Settings**
@@ -92,13 +92,14 @@ After backend deployment, update the CORS configuration in `server/server.js` if
    - Install Command: `npm install`
 
 3. **Environment Variables**
-   ```env
-   VITE_API_URL=https://your-backend-deployment.vercel.app/api
-   ```
+   In Project Settings → Environment Variables, add:
+   **Key:** `VITE_API_URL` **Value:** `https://your-backend-deployment.vercel.app/api`
 
 4. **Deploy**
    - Click "Deploy"
    - Wait for deployment to complete
+
+**⚠️ Critical:** Make sure to set the Root Directory to `chat-app` when importing the project, otherwise the build will fail.
 
 ## 🔄 Step 3: Update Cross-References
 
@@ -179,19 +180,26 @@ Should return:
 
 ### Common Issues
 
-1. **CORS Errors**
+1. **MIME Type Error (Frontend)**
+   - Error: "Expected a JavaScript module script but server responded with MIME type text/html"
+   - **Solution:** Ensure Root Directory is set to `chat-app` in Vercel
+   - **Solution:** Try redeploying with simplified vercel.json
+   - **Solution:** Check that build output is in `dist` folder
+
+2. **CORS Errors**
    - Check `CLIENT_URL` in backend environment
    - Verify CORS configuration in `server.js`
 
-2. **Database Connection**
+3. **Database Connection**
    - Verify MongoDB URI format
    - Check IP whitelist in MongoDB Atlas
 
-3. **Build Failures**
+4. **Build Failures**
    - Check Node.js version compatibility
    - Verify all dependencies are in `package.json`
+   - Ensure Vite build completes successfully
 
-4. **Socket.IO Issues**
+5. **Socket.IO Issues**
    - Vercel has limitations with WebSockets
    - Consider using polling fallback
 
