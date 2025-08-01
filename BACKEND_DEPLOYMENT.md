@@ -45,9 +45,71 @@ your_super_secure_jwt_secret_here_at_least_32_characters_long_make_it_random
 7d
 ```
 
-**CLIENT_URL** (Update after frontend deployment)
+**CLIENT_URL** (Update with your frontend URL)
 ```
-https://your-frontend-domain.vercel.app
+https://chatchout.vercel.app
+```
+
+**STREAM_API_KEY**
+```
+twe26yayd39n
+```
+
+**STREAM_API_SECRET**
+```
+wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevgpr
+```
+
+### Step 5: CORS Configuration
+This is critical to fix the current CORS errors!
+
+1. Make sure the vercel.json file has the following configuration:
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js",
+      "headers": {
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": "https://chatchout.vercel.app",
+        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+      }
+    }
+  ]
+}
+```
+
+2. Make sure api/index.js has proper CORS handling:
+```javascript
+// Vercel serverless function entry point
+const app = require('../server.js');
+
+// Add CORS headers for Vercel deployment
+app.use((req, res, next) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', 'https://chatchout.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+
+  // Handle OPTIONS method
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
+
+module.exports = app;
 ```
 
 **STREAM_API_KEY**
