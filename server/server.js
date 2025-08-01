@@ -20,12 +20,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: [
-      process.env.CLIENT_URL,
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'https://chatchout.vercel.app'
-    ],
+    origin: '*', // Allow all origins temporarily for testing
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -47,25 +42,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // CORS configuration
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173', 
-  'http://localhost:3000',
-  'https://chatchout.vercel.app'
-];
-
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      console.log('CORS error:', origin);
-      callback(new Error('The CORS policy for this site does not allow access from the specified origin.'));
-    }
-  },
+  origin: '*', // Allow all origins temporarily for testing
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

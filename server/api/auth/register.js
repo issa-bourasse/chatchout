@@ -18,7 +18,14 @@ const app = express();
 
 // Special CORS for this endpoint
 app.use(cors({
-  origin: ['https://chatchout.vercel.app', 'https://chatchout-q7j21vtf6-cheimabarhoumis-projects.vercel.app'],
+  origin: [
+    'https://chatchout.vercel.app',
+    'https://chatchout-q7j21vtf6-cheimabarhoumis-projects.vercel.app',
+    'https://chatchout-res1.vercel.app',
+    'https://chatchout-res1-git-main-cheimabarhoumis-projects.vercel.app',
+    'https://chatchout-res1-8fi6ir2sp-cheimabarhoumis-projects.vercel.app',
+    '*'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
