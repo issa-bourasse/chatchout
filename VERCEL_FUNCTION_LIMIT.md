@@ -31,18 +31,42 @@ Each consolidated file contains a main handler function that:
 
 ### 3. Updated vercel.json
 
-The vercel.json file has been updated to route multiple API paths to the same handler files:
+We've updated the vercel.json file in two important ways:
 
-```json
-{
-  "src": "/api/auth/login",
-  "dest": "/api/consolidated-api.js"
-},
-{
-  "src": "/api/auth/logout",
-  "dest": "/api/consolidated-api.js"
-}
-```
+1. **Route configuration**: Routes multiple API paths to the same handler files
+    ```json
+    {
+      "src": "/api/auth/login",
+      "dest": "/api/consolidated-api.js"
+    },
+    {
+      "src": "/api/auth/logout",
+      "dest": "/api/consolidated-api.js"
+    }
+    ```
+
+2. **Build configuration**: Specifically lists only the necessary files instead of using wildcards
+    ```json
+    "builds": [
+      { "src": "server.js", "use": "@vercel/node" },
+      { "src": "api/consolidated-*.js", "use": "@vercel/node" },
+      { "src": "api/allowCors.js", "use": "@vercel/node" },
+      { "src": "api/auth-middleware-new.js", "use": "@vercel/node" },
+      { "src": "api/cors-test.js", "use": "@vercel/node" }
+    ]
+    ```
+
+## Important: Before Each Deployment
+
+To ensure your deployment stays within the function limits, run one of these scripts before pushing to GitHub:
+
+- **Windows**: `.\cleanup-vercel-functions.ps1`
+- **Linux/Mac**: `./cleanup-vercel-functions.sh`
+
+These scripts will:
+1. Move unused API files to an `_archived` folder
+2. Update your vercel.json if needed
+3. Ensure only the necessary files are included in the build
 
 ## Benefits
 

@@ -6,7 +6,19 @@
       "use": "@vercel/node"
     },
     {
-      "src": "api/*.js",
+      "src": "api/consolidated-*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/allowCors.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/auth-middleware-new.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/cors-test.js",
       "use": "@vercel/node"
     }
   ],

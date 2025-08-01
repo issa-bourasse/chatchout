@@ -211,6 +211,61 @@ cd chat-app
 npm run build
 ```
 
+## 🚀 Deployment to Vercel
+
+### Optimized for Vercel Serverless
+
+ChatChout is optimized for deployment to Vercel's serverless platform.
+
+#### Function Limit Solution
+
+Vercel's Hobby plan has a 12 serverless function limit. To work within this constraint, the API is organized using consolidated handlers:
+
+1. **Consolidated Handlers**: Multiple API endpoints are combined into single handler files
+   - `consolidated-api.js`: Handles login, logout, user search, and chats list
+   - `consolidated-auth.js`: Handles registration and authentication testing
+
+2. **Utility Files**:
+   - `auth-middleware-new.js`: Authentication middleware
+   - `allowCors.js`: CORS support for serverless functions
+
+3. **Deployment Tools**:
+   - `deploy.sh` / `deploy.ps1`: Deployment scripts that check function count
+   - `cleanup-vercel-functions.sh` / `cleanup-vercel-functions.ps1`: Scripts to archive unused functions
+
+For detailed information on the deployment solution, see [VERCEL_FUNCTION_LIMIT.md](VERCEL_FUNCTION_LIMIT.md).
+
+### Deployment Steps
+
+1. **Clean up unused functions** (if needed):
+   ```bash
+   # Linux/Mac
+   bash cleanup-vercel-functions.sh
+   
+   # Windows
+   .\cleanup-vercel-functions.ps1
+   ```
+
+2. **Deploy to Vercel**:
+   ```bash
+   # Linux/Mac
+   bash deploy.sh
+   
+   # Windows
+   .\deploy.ps1
+   ```
+
+3. **Test API endpoints**:
+   ```bash
+   # Linux/Mac
+   bash test-api.sh
+   
+   # Windows
+   .\test-api.ps1
+   ```
+
+For complete deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## 🌟 Features in Detail
 
 ### Real-time Features
