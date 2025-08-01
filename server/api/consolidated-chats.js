@@ -88,7 +88,7 @@ async function handler(req, res) {
     return res.status(500).json({
       success: false,
       message: `Server error processing ${path}`,
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: error.message
     });
   }
 }
@@ -135,7 +135,11 @@ async function handleGetChats(req, res) {
     });
   } catch (error) {
     console.error('[ChatsAPI] Get chats error:', error);
-    throw error;
+    return res.status(500).json({
+      success: false,
+      message: 'Error retrieving chats',
+      error: error.message
+    });
   }
 }
 
@@ -144,6 +148,8 @@ async function handleGetChats(req, res) {
  */
 async function handleCreatePrivateChat(req, res) {
   try {
+    console.log('[ChatsAPI] Starting private chat creation...');
+    
     // Authenticate user
     const authResult = await auth(req, res);
     if (!authResult || !authResult.success) {
@@ -151,7 +157,9 @@ async function handleCreatePrivateChat(req, res) {
       return;
     }
     
+    // Access request body
     const { userId } = req.body;
+    console.log('[ChatsAPI] Request to create chat with user:', userId);
     
     if (!userId) {
       return res.status(400).json({
@@ -173,12 +181,15 @@ async function handleCreatePrivateChat(req, res) {
     
     // Check if they are friends
     const isFriend = req.user.friends && req.user.friends.some(
-      friend => friend.user && (friend.user.toString() === userId || friend.user._id.toString() === userId)
+      friend => friend.user && (
+        friend.user.toString() === userId || 
+        (friend.user._id && friend.user._id.toString() === userId)
+      )
     );
     
+    // Log friendship status but don't block chat creation if they're not friends
     if (!isFriend) {
-      console.log(`[ChatsAPI] Users are not friends. Current user friends:`, req.user.friends);
-      console.log(`[ChatsAPI] Looking for user ID ${userId} in friends list`);
+      console.log(`[ChatsAPI] Users are not friends. This could be due to recent friend acceptance.`);
     }
     
     // Check if a chat already exists between these two users
@@ -206,9 +217,14 @@ async function handleCreatePrivateChat(req, res) {
         { user: req.user._id, role: 'user' },
         { user: userId, role: 'user' }
       ],
-      createdBy: req.user._id
+      createdBy: req.user._id,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
     
+    console.log('[ChatsAPI] Saving new chat with participants:', newChat.participants);
+    
+    // Save the new chat
     await newChat.save();
     
     // Populate the participants
@@ -224,7 +240,11 @@ async function handleCreatePrivateChat(req, res) {
     });
   } catch (error) {
     console.error('[ChatsAPI] Create private chat error:', error);
-    throw error;
+    return res.status(500).json({
+      success: false,
+      message: 'Error creating private chat',
+      error: error.message
+    });
   }
 }
 
