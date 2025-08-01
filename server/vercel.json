@@ -24,6 +24,10 @@
     {
       "src": "api/auth-debug.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/session-check.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -34,6 +38,10 @@
     {
       "src": "/api/auth/debug",
       "dest": "/api/auth-debug.js"
+    },
+    {
+      "src": "/api/session-check",
+      "dest": "/api/session-check.js"
     },
     {
       "src": "/api/auth/register",

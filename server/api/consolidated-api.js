@@ -146,16 +146,16 @@ async function handleLogin(req, res) {
       });
     }
     
-    // Update user status
+    // Update user status - we're now keeping users online longer
     user.isOnline = true;
     user.lastSeen = new Date();
     await user.save();
     
-    // Generate JWT token
+    // Generate JWT token with longer expiry
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRE || '7d' }
+      { expiresIn: process.env.JWT_EXPIRE || '30d' }  // Increased from 7d to 30d
     );
     console.log('[Login] Generated token for user:', user._id);
     

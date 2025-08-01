@@ -19,11 +19,36 @@ export const StreamVideoProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [streamConfig, setStreamConfig] = useState(null);
+  const [videoCallEnabled, setVideoCallEnabled] = useState(false);
+
+  // Check if video calls are enabled from server config
+  useEffect(() => {
+    const checkVideoCallEnabled = async () => {
+      try {
+        const response = await fetch('/api/session-check');
+        const data = await response.json();
+        setVideoCallEnabled(data.config?.features?.videoCall !== false);
+      } catch (err) {
+        console.error('Failed to check video call availability:', err);
+        setVideoCallEnabled(false);
+      }
+    };
+    
+    if (user) {
+      checkVideoCallEnabled();
+    }
+  }, [user]);
 
   useEffect(() => {
     const initializeStreamVideo = async () => {
       if (!user) {
         console.log('🎥 User not available yet, skipping Stream.io initialization');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!videoCallEnabled) {
+        console.log('🎥 Video calls are disabled by server config');
         setIsLoading(false);
         return;
       }

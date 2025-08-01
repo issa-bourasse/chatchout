@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const config = require('../utils/config');
 require('dotenv').config();
 
 // Connect to MongoDB if not already connected
@@ -28,6 +29,11 @@ const auth = async (req, res, next) => {
   try {
     // Get token from header
     let token = req.headers.authorization;
+    
+    // Check query string for token as fallback (useful for WebSocket connections)
+    if (!token && req.query && req.query.token) {
+      token = req.query.token;
+    }
     
     // Handle different authorization header formats
     if (token && token.startsWith('Bearer ')) {
@@ -85,11 +91,24 @@ const auth = async (req, res, next) => {
       return handleError(res, 401, 'User not found');
     }
     
+    // Update user's last seen timestamp silently without changing online status
+    // This helps keep the session alive without forcing status changes
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    if (!user.lastSeen || user.lastSeen < fifteenMinutesAgo) {
+      console.log('[Auth] Updating last seen for user:', user._id);
+      // Update in background without awaiting
+      User.findByIdAndUpdate(user._id, { lastSeen: new Date() }).exec()
+        .catch(err => console.error('[Auth] Error updating last seen:', err));
+    }
+    
     console.log('[Auth] User authenticated:', user.name);
     
     // Set user in request
     req.user = user;
     req.userId = userId;
+    
+    // Add feature configuration to request
+    req.config = config;
     
     // Continue to route handler or return success
     if (typeof next === 'function') {

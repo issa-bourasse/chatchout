@@ -16,9 +16,29 @@ export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [socketEnabled, setSocketEnabled] = useState(false);
+
+  // Check if socket is enabled from server config
+  useEffect(() => {
+    const checkSocketEnabled = async () => {
+      try {
+        const response = await fetch('/api/session-check');
+        const data = await response.json();
+        setSocketEnabled(data.config?.features?.socket !== false);
+      } catch (err) {
+        console.error('Failed to check socket availability:', err);
+        setSocketEnabled(false);
+      }
+    };
+    
+    if (user) {
+      checkSocketEnabled();
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (user) {
+    if (user && socketEnabled) {
+      console.log('Socket is enabled, connecting...');
       // Connect to socket when user is authenticated
       socketService.connect();
 
@@ -58,24 +78,29 @@ export const SocketProvider = ({ children }) => {
         setIsConnected(false);
         setOnlineUsers([]);
       };
+    } else if (user && !socketEnabled) {
+      console.log('Socket is disabled by server config');
+      setIsConnected(false);
+      setOnlineUsers([]);
     } else {
       // Disconnect when user logs out
       socketService.disconnect();
       setIsConnected(false);
       setOnlineUsers([]);
     }
-  }, [user]);
+  }, [user, socketEnabled]);
 
   const value = {
     socket: socketService,
     isConnected,
     onlineUsers,
+    socketEnabled,
     
     // Chat methods
-    joinChat: (chatId) => socketService.joinChat(chatId),
-    leaveChat: (chatId) => socketService.leaveChat(chatId),
+    joinChat: (chatId) => socketEnabled ? socketService.joinChat(chatId) : Promise.resolve(),
+    leaveChat: (chatId) => socketEnabled ? socketService.leaveChat(chatId) : Promise.resolve(),
     sendMessage: (chatId, content, type, replyTo) => 
-      socketService.sendMessage(chatId, content, type, replyTo),
+      socketEnabled ? socketService.sendMessage(chatId, content, type, replyTo) : Promise.resolve(),
     
     // Typing indicators
     startTyping: (chatId) => socketService.startTyping(chatId),

@@ -23,6 +23,20 @@ const VideoCall = () => {
 
   useEffect(() => {
     const initializeCall = async () => {
+      // Check if video calls are enabled from server config
+      try {
+        const response = await fetch('/api/session-check');
+        const data = await response.json();
+        
+        if (!data.config?.features?.videoCall) {
+          setError('Video calling is currently disabled');
+          setIsLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to check video call availability:', err);
+      }
+      
       if (!isInitialized) {
         setError('Video calling not available');
         setIsLoading(false);
