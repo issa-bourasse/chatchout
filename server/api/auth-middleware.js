@@ -1,73 +1,113 @@
-// Fixed authentication middleware for Vercel serverless functions
+// Improved authentication middleware for Vercel serverless functions
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 require('dotenv').config();
 
-// Connect to MongoDB if not already connected
-let isConnected = false;
+// Connect to MongoDB
 const connectDB = async () => {
-  if (isConnected) return;
+  if (mongoose.connection.readyState >= 1) return;
+  
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    isConnected = true;
-    console.log('MongoDB connected for auth middleware');
+    console.log('MongoDB connected in auth middleware');
   } catch (err) {
     console.error('MongoDB connection error:', err);
     throw err;
   }
 };
 
-// Authentication middleware - no CORS wrapping here
-async function auth(req, res) {
+// Extract token from headers
+const getToken = (req) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader) {
+    return null;
+  }
+  
+  // Handle both "Bearer token" and just "token" formats
+  return authHeader.startsWith('Bearer ') 
+    ? authHeader.substring(7) 
+    : authHeader;
+};
+
+// Middleware function
+const auth = async (req, res) => {
   try {
-    console.log('Auth middleware: Checking token');
-    // Get token from header
-    let token = req.headers.authorization;
-    
-    // Handle different authorization header formats
-    if (token && token.startsWith('Bearer ')) {
-      token = token.replace('Bearer ', '');
-    }
-    
-    console.log('Token present:', !!token);
+    // Get token
+    const token = getToken(req);
     
     if (!token) {
-      console.log('No token provided');
       res.status(401).json({ 
-        success: false,
-        message: 'No token provided, authorization denied' 
+        success: false, 
+        message: 'Authentication required. No token provided.'
       });
       return null;
     }
-
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Token decoded:', decoded);
     
-    // Connect to DB
+    // Verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (tokenError) {
+      console.error('Token verification failed:', tokenError.message);
+      
+      if (tokenError.name === 'TokenExpiredError') {
+        res.status(401).json({ 
+          success: false, 
+          message: 'Token expired. Please login again.' 
+        });
+      } else {
+        res.status(401).json({ 
+          success: false, 
+          message: 'Invalid token. Please login again.' 
+        });
+      }
+      
+      return null;
+    }
+    
+    // Connect to database
     await connectDB();
     
-    // Get user from database - note we check both id and userId
-    // because we've had different token formats
+    // Extract user ID (handle both formats)
     const userId = decoded.id || decoded.userId;
-    console.log('Looking for user with ID:', userId);
     
+    if (!userId) {
+      console.error('No user ID in token payload:', decoded);
+      res.status(401).json({ 
+        success: false, 
+        message: 'Invalid token format. Missing user ID.' 
+      });
+      return null;
+    }
+    
+    // Find user
     const user = await User.findById(userId).select('-password');
     
     if (!user) {
-      console.log('User not found for ID:', userId);
+      console.error(`User not found with ID: ${userId}`);
       res.status(401).json({ 
-        success: false,
-        message: 'Token is not valid, user not found' 
+        success: false, 
+        message: 'User not found. Please login again.' 
       });
       return null;
     }
-
-    console.log('User authenticated:', user.name);
     
-    // Return the authenticated user
+    // Return authenticated user
     return user;
+    
+  } catch (error) {
+    console.error('Authentication error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during authentication' 
+    });
+    return null;
+  }
+};
+
+module.exports = auth;
   } catch (error) {
     console.error('Auth middleware error:', error);
     

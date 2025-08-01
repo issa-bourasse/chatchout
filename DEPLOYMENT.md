@@ -77,60 +77,39 @@ STREAM_API_SECRET=wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevg
    - Wait for deployment to complete
    - Note your backend URL (e.g., `https://chatchout-backend.vercel.app`)
 
-### 1.2 Authentication and API Routes for Vercel
+### 1.2 Authentication and API Implementation for Vercel
 
-We've completely redesigned the authentication flow to work reliably in a serverless environment:
+We've completely redesigned the authentication flow to work reliably on Vercel's serverless platform:
 
-1. **Authentication Middleware** (`auth-middleware.js`):
-   - Handles token extraction, verification, and user lookup
-   - Works in both Express and serverless environments
-   - Handles different token formats for backward compatibility
+#### Key Improvements:
 
-2. **Authentication Endpoints**:
-   - `fixed-register.js`: User registration with proper field handling
-   - `fixed-login.js`: User login with JWT token generation
-   - `fixed-logout.js`: User logout with online status update
-   - `auth-test.js`: Debug endpoint to verify token validity
+1. **Dedicated API Handlers**: Each endpoint has its own handler file optimized for serverless execution
+2. **Robust Authentication**: Our authentication middleware works in both traditional and serverless contexts
+3. **Consistent Error Handling**: All handlers use standardized error response formats
+4. **Database Connection Management**: Each handler manages its MongoDB connection efficiently
 
-3. **API Endpoints**:
-   - `users-search.js`: Search for users by name or email
-   - `chats-list.js`: Get user's chat list with pagination
+#### Authentication Endpoints:
 
-4. **Vercel Routes Configuration**:
-   ```json
-   {
-     "src": "/api/auth/register",
-     "dest": "/api/fixed-register.js"
-   },
-   {
-     "src": "/api/auth/login",
-     "dest": "/api/fixed-login.js"
-   },
-   {
-     "src": "/api/auth/logout",
-     "dest": "/api/fixed-logout.js"
-   },
-   {
-     "src": "/api/auth/test",
-     "dest": "/api/auth-test.js"
-   },
-   {
-     "src": "/api/users/search",
-     "dest": "/api/users-search.js"
-   },
-   {
-     "src": "/api/chats",
-     "dest": "/api/chats-list.js"
-   }
-   ```
+- `/api/auth/register`: User registration (fixed-register.js)
+- `/api/auth/login`: User login (improved-login.js)
+- `/api/auth/logout`: User logout (improved-logout.js)
+- `/api/auth/test`: Test authentication (auth-test.js)
 
-**Important Authentication Notes**:
-- All endpoints establish their own MongoDB connection
-- All endpoints handle preflight OPTIONS requests
-- Token generation uses `{ id: user._id }` format
-- Middleware handles both `id` and `userId` fields for compatibility
+#### API Endpoints:
 
-See the [FIELD_NAMING.md](./FIELD_NAMING.md) document for more details on the authentication architecture.
+- `/api/users/search`: Search for users (improved-users-search.js)
+- `/api/chats`: List user's chats (improved-chats-list.js)
+
+#### Token Handling:
+
+Frontend must include the JWT token in API requests as follows:
+```javascript
+headers: {
+  'Authorization': `Bearer ${token}`
+}
+```
+
+See the comprehensive `AUTH_GUIDE.md` for detailed implementation information.
 
 ### 1.3 Debugging Authentication Issues
 

@@ -21,11 +21,11 @@
     },
     {
       "src": "/api/auth/login",
-      "dest": "/api/fixed-login.js"
+      "dest": "/api/improved-login.js"
     },
     {
       "src": "/api/auth/logout",
-      "dest": "/api/fixed-logout.js"
+      "dest": "/api/improved-logout.js"
     },
     {
       "src": "/api/auth/test",
@@ -33,11 +33,11 @@
     },
     {
       "src": "/api/users/search",
-      "dest": "/api/fixed-users-search.js"
+      "dest": "/api/improved-users-search.js"
     },
     {
       "src": "/api/chats",
-      "dest": "/api/chats-list.js"
+      "dest": "/api/improved-chats-list.js"
     },
     {
       "src": "/(.*)",
