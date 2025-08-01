@@ -28,8 +28,16 @@ vercel --prod
 
 echo "✅ Deployment complete!"
 echo "📝 Remember to check the following:"
-echo "  1. Verify registration flow works with the fixed handler"
-echo "  2. Test login functionality with the fixed login handler"
-echo "  3. Verify chat and video call features"
+echo "  1. Test registration with the fixed handler"
+echo "  2. Test login with the fixed login handler"
+echo "  3. Test authentication with the auth test endpoint: ${BACKEND_URL}/api/auth/test"
+echo "  4. Test user search and chat listing endpoints"
+echo "  5. Test logout functionality"
 
-echo "🔗 See FIELD_NAMING.md for details on the authentication implementation"
+echo "🔍 Debugging Tips:"
+echo "  - Check browser console for error messages"
+echo "  - Examine localStorage for the authentication token"
+echo "  - Review Vercel function logs for server-side errors"
+echo "  - Use auth test endpoint to verify token validity"
+
+echo "🔗 See FIELD_NAMING.md for details on the authentication architecture"

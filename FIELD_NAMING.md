@@ -1,31 +1,50 @@
-# Authentication Field Handling
+# Authentication and API Implementation
 
-## User Model Structure
-After examining the MongoDB database, we confirmed the User model has:
-- A required `name` field
-- No `username` field (contrary to what was initially assumed)
-- Standard fields like `email`, `password`, `avatar`, etc.
+## Authentication Flow Overhaul
 
-## Registration Implementation
-We've updated the `fixed-register.js` handler to:
-1. Accept requests from the frontend with the `name` field
-2. Create users with the proper fields that match the User model
-3. Return the user data in the format expected by the frontend
+### Authentication Architecture
+We've completely redesigned the authentication flow to work reliably in a serverless environment:
 
-## Login Implementation
-We've created a `fixed-login.js` handler that:
-1. Accepts login requests with email and password
-2. Validates credentials against the User model
-3. Updates the user's online status and last seen timestamp
-4. Returns a JWT token and user data in the format expected by the frontend
+1. **Authentication Middleware** (`auth-middleware.js`):
+   - Extracts token from Authorization header
+   - Verifies JWT signature
+   - Handles both `id` and `userId` fields in token payload
+   - Connects to database to validate user exists
+   - Returns the user object if authenticated, null otherwise
 
-## Best Practices Going Forward
-When developing frontend and backend components:
-1. Ensure that frontend form field names match the backend model field names
-2. Document API contracts including required field names
-3. Use validation on both ends to ensure data integrity
-4. Consider using TypeScript interfaces/types shared between frontend and backend
-5. Always check the database schema before implementing API handlers
+2. **Auth Endpoints**:
+   - `fixed-register.js`: User registration with proper field handling
+   - `fixed-login.js`: User login with JWT token generation
+   - `fixed-logout.js`: User logout with online status update
+   - `auth-test.js`: Debug endpoint to verify token validity
+
+### API Endpoints
+All API endpoints now follow a consistent pattern:
+1. Connect to MongoDB first
+2. Call the auth middleware to authenticate the user
+3. Process the request if authentication succeeds
+4. Return appropriate response
+
+## Common Authentication Issues Fixed
+
+1. **Token Payload Consistency**:
+   - Tokens now consistently use `{ id: user._id }` in the payload
+   - Auth middleware handles legacy tokens with either `id` or `userId` fields
+
+2. **Authentication in Serverless Functions**:
+   - Middleware adapted for both Express and serverless environments
+   - Clear separation between auth verification and route handling
+
+3. **CORS Handling**:
+   - All endpoints use the allowCors wrapper
+   - Proper OPTIONS handling for preflight requests
+
+4. **Database Connection**:
+   - Each handler establishes its own MongoDB connection
+   - Connection state is properly managed
+
+## Debugging Authentication
+Use the `/api/auth/test` endpoint to check token validity without accessing the database. This helps isolate JWT issues from database access issues.
 
 ## MongoDB Document Example
 ```json

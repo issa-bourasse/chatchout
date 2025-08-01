@@ -77,21 +77,26 @@ STREAM_API_SECRET=wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevg
    - Wait for deployment to complete
    - Note your backend URL (e.g., `https://chatchout-backend.vercel.app`)
 
-### 1.2 Authentication Handlers for Vercel
+### 1.2 Authentication and API Routes for Vercel
 
-We've created specialized serverless function handlers for authentication endpoints:
+We've completely redesigned the authentication flow to work reliably in a serverless environment:
 
-1. **Registration Handler** (`fixed-register.js`):
-   - The User model has a required `name` field (but no `username` field)
-   - The frontend correctly sends a `name` field in the registration form
-   - Our handler creates users with the proper fields from the model
+1. **Authentication Middleware** (`auth-middleware.js`):
+   - Handles token extraction, verification, and user lookup
+   - Works in both Express and serverless environments
+   - Handles different token formats for backward compatibility
 
-2. **Login Handler** (`fixed-login.js`):
-   - Accepts login requests with email and password
-   - Validates credentials against the database
-   - Returns a properly formatted response with user data and token
-   
-3. **Vercel Routes Configuration**:
+2. **Authentication Endpoints**:
+   - `fixed-register.js`: User registration with proper field handling
+   - `fixed-login.js`: User login with JWT token generation
+   - `fixed-logout.js`: User logout with online status update
+   - `auth-test.js`: Debug endpoint to verify token validity
+
+3. **API Endpoints**:
+   - `users-search.js`: Search for users by name or email
+   - `chats-list.js`: Get user's chat list with pagination
+
+4. **Vercel Routes Configuration**:
    ```json
    {
      "src": "/api/auth/register",
@@ -100,12 +105,43 @@ We've created specialized serverless function handlers for authentication endpoi
    {
      "src": "/api/auth/login",
      "dest": "/api/fixed-login.js"
+   },
+   {
+     "src": "/api/auth/logout",
+     "dest": "/api/fixed-logout.js"
+   },
+   {
+     "src": "/api/auth/test",
+     "dest": "/api/auth-test.js"
+   },
+   {
+     "src": "/api/users/search",
+     "dest": "/api/users-search.js"
+   },
+   {
+     "src": "/api/chats",
+     "dest": "/api/chats-list.js"
    }
    ```
 
-See the [FIELD_NAMING.md](./FIELD_NAMING.md) document for more details on the user model structure.
+**Important Authentication Notes**:
+- All endpoints establish their own MongoDB connection
+- All endpoints handle preflight OPTIONS requests
+- Token generation uses `{ id: user._id }` format
+- Middleware handles both `id` and `userId` fields for compatibility
 
-### 1.3 Update CORS Settings
+See the [FIELD_NAMING.md](./FIELD_NAMING.md) document for more details on the authentication architecture.
+
+### 1.3 Debugging Authentication Issues
+
+If you're experiencing authentication problems in production:
+
+1. Check the token in localStorage using browser devtools
+2. Make a request to `/api/auth/test` to verify token validity
+3. Look for detailed error messages in server logs
+4. Ensure environment variables are set correctly in Vercel
+
+### 1.4 Update CORS Settings
 
 After backend deployment, update the CORS configuration in `server/server.js` if needed.
 
