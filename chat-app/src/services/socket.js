@@ -15,7 +15,10 @@ class SocketService {
       return;
     }
 
-    const serverUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    // Use dedicated Socket URL if available, otherwise fallback to API URL without /api
+    const serverUrl = import.meta.env.VITE_SOCKET_URL || 
+                      import.meta.env.VITE_API_URL?.replace('/api', '') || 
+                      'http://localhost:5000';
 
     this.socket = io(serverUrl, {
       auth: {

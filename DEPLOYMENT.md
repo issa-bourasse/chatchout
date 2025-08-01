@@ -26,7 +26,29 @@ chatchout/
 
 ## 🔧 Step 1: Backend Deployment
 
-### 1.1 Deploy Backend to Vercel
+### 1.1 Setup Environment Variables
+
+Create an `.env` file in the `server` directory with these values:
+
+```bash
+# Server Configuration
+PORT=5000
+NODE_ENV=production
+
+# Database Configuration
+MONGODB_URI=mongodb+srv://admin:admin12345$@cluster0.sbge678.mongodb.net/chatchout?retryWrites=true&w=majority&appName=Cluster0
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_here_change_in_production
+JWT_EXPIRE=7d
+
+# CORS Configuration
+CLIENT_URL=https://chatchout.vercel.app
+
+# Stream.io Video Configuration
+STREAM_API_KEY=twe26yayd39n
+STREAM_API_SECRET=wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevgpr
+```
 
 1. **Go to Vercel Dashboard**
    - Visit https://vercel.com/dashboard
@@ -61,14 +83,28 @@ After backend deployment, update the CORS configuration in `server/server.js` if
 
 ## 🎨 Step 2: Frontend Deployment
 
-### 2.1 Update Frontend Environment
+### 2.1 Setup Frontend Environment Variables
 
-1. **Update `.env.production`**
-   ```env
-   VITE_API_URL=https://your-backend-deployment.vercel.app/api
-   VITE_APP_NAME=ChatChout
-   VITE_APP_VERSION=1.0.0
-   ```
+Create an `.env` file in the `chat-app` directory with these values:
+
+```bash
+# Production Backend API URL
+VITE_API_URL=https://chatchout-res1.vercel.app/api
+
+# Production Socket.IO URL
+VITE_SOCKET_URL=https://chatchout-res1.vercel.app
+
+# Stream.io Video Configuration
+VITE_STREAM_API_KEY=twe26yayd39n
+
+# App Configuration
+VITE_APP_NAME=ChatChout
+VITE_APP_VERSION=1.0.0
+
+# Feature Flags
+VITE_ENABLE_NOTIFICATIONS=true
+VITE_ENABLE_VIDEO_CALLS=true
+```
 
 2. **Commit Changes**
    ```bash
@@ -93,7 +129,16 @@ After backend deployment, update the CORS configuration in `server/server.js` if
 
 3. **Environment Variables**
    In Project Settings → Environment Variables, add:
-   **Key:** `VITE_API_URL` **Value:** `https://your-backend-deployment.vercel.app/api`
+   
+   | Key | Value |
+   |-----|-------|
+   | `VITE_API_URL` | `https://chatchout-res1.vercel.app/api` |
+   | `VITE_SOCKET_URL` | `https://chatchout-res1.vercel.app` |
+   | `VITE_STREAM_API_KEY` | `twe26yayd39n` |
+   | `VITE_APP_NAME` | `ChatChout` |
+   | `VITE_APP_VERSION` | `1.0.0` |
+   | `VITE_ENABLE_NOTIFICATIONS` | `true` |
+   | `VITE_ENABLE_VIDEO_CALLS` | `true` |
 
 4. **Deploy**
    - Click "Deploy"
