@@ -84,23 +84,3 @@ async function handler(req, res) {
 }
 
 module.exports = allowCors(handler);
-  } catch (error) {
-    console.error('User search error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error during user search',
-      error: error.message
-    });
-  }
-}
-  } catch (error) {
-    console.error('User search error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error during user search',
-      error: error.message
-    });
-  }
-}
-
-module.exports = allowCors(handler);

@@ -2,6 +2,7 @@
 
 # ChatChout API Test Script
 # This script tests all the API endpoints after deployment
+# Note: The backend has been optimized to use consolidated handlers to stay within Vercel's function limits
 
 BASE_URL="https://chatchout-api.vercel.app/api"
 TOKEN=""

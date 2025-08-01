@@ -1,5 +1,6 @@
 # ChatChout API Test Script (PowerShell version)
 # This script tests all the API endpoints after deployment
+# Note: The backend has been optimized to use consolidated handlers to stay within Vercel's function limits
 
 $BaseUrl = "https://chatchout-api.vercel.app/api"
 $Token = ""
