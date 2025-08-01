@@ -46,6 +46,14 @@ const auth = async (req, res, next) => {
       return handleError(res, 401, 'No authentication token provided');
     }
 
+    // Connect to MongoDB first to ensure we can validate users
+    try {
+      await connectDB();
+    } catch (dbError) {
+      console.error('[Auth] Database connection error:', dbError);
+      return handleError(res, 500, 'Database connection error');
+    }
+
     // Verify token
     let decoded;
     try {
@@ -58,14 +66,6 @@ const auth = async (req, res, next) => {
       } else {
         return handleError(res, 401, 'Invalid authentication token');
       }
-    }
-    
-    // Connect to MongoDB
-    try {
-      await connectDB();
-    } catch (dbError) {
-      console.error('[Auth] Database connection error:', dbError);
-      return handleError(res, 500, 'Database connection error');
     }
     
     // Get user ID from token - handle different formats

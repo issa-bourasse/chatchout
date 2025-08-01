@@ -42,10 +42,34 @@ async function handler(req, res) {
     // Connect to database
     await connectDB();
     
+    // Return feature configuration even without authentication
+    // This allows clients to know which features are enabled
+    if (!req.headers.authorization) {
+      console.log('[SessionCheck] No authentication token, returning basic config only');
+      return res.status(200).json({
+        success: true,
+        message: 'Basic configuration',
+        authenticated: false,
+        config: {
+          features: config.features
+        }
+      });
+    }
+    
     // Authenticate user
     const authResult = await auth(req, res);
     if (!authResult || !authResult.success) {
-      // Authentication error response already sent by middleware
+      // If auth failed but we haven't sent a response yet, send basic config
+      if (!res.headersSent) {
+        return res.status(200).json({
+          success: true,
+          message: 'Authentication failed, but returning basic config',
+          authenticated: false,
+          config: {
+            features: config.features
+          }
+        });
+      }
       return;
     }
     

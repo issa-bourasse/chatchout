@@ -1,6 +1,23 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Determine the base URL based on the environment
+const determineBaseUrl = () => {
+  // First try environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // In production, check domain and use appropriate API URL
+  if (window.location.hostname === 'chatchout.vercel.app') {
+    return 'https://chatchout-res1.vercel.app/api';
+  }
+  
+  // Default for local development
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = determineBaseUrl();
+console.log('Using API base URL:', API_BASE_URL);
 
 // Create axios instance
 const api = axios.create({
@@ -8,6 +25,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: false, // Set to true if you need cookies to be sent
 });
 
 // Request interceptor to add auth token

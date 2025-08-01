@@ -305,12 +305,13 @@ async function handleChatsList(req, res) {
     const skip = (page - 1) * limit;
     
     console.log('[ChatsList] Pagination:', { page, limit, skip });
+    console.log('[ChatsList] Looking for chats for user:', req.user._id);
     
-    // Find user's chats
+    // Find user's chats with better query structure
     const chats = await Chat.find({
-      participants: req.user._id
+      'participants.user': req.user._id
     })
-    .populate('participants', '_id name avatar isOnline lastSeen')
+    .populate('participants.user', 'name email avatar isOnline lastSeen')
     .populate({
       path: 'lastMessage',
       select: 'content sender createdAt',
@@ -326,7 +327,7 @@ async function handleChatsList(req, res) {
     console.log('[ChatsList] Found', chats.length, 'chats');
     
     // Count total chats for pagination
-    const total = await Chat.countDocuments({ participants: req.user._id });
+    const total = await Chat.countDocuments({ 'participants.user': req.user._id });
     
     // Return results
     return res.status(200).json({

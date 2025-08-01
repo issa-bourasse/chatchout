@@ -595,7 +595,17 @@ const ChatApp = () => {
 
   // Handle creating chat with friend
   const handleCreateChatWithFriend = (friend) => {
-    createPrivateChatMutation.mutate(friend._id)
+    // Handle both id and _id properties to ensure compatibility
+    const friendId = friend.id || friend._id;
+    console.log('Creating chat with friend ID:', friendId);
+    
+    if (!friendId) {
+      console.error('Friend object missing ID:', friend);
+      alert('Unable to create chat: Invalid friend data');
+      return;
+    }
+    
+    createPrivateChatMutation.mutate(friendId);
   }
 
   // Handle sending friend request

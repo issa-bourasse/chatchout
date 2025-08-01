@@ -30,6 +30,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/consolidated-chats.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/friends-debug.js",
       "use": "@vercel/node"
     }
@@ -73,7 +77,11 @@
     },
     {
       "src": "/api/chats",
-      "dest": "/api/consolidated-api.js"
+      "dest": "/api/consolidated-chats.js"
+    },
+    {
+      "src": "/api/chats/private",
+      "dest": "/api/consolidated-chats.js"
     },
     {
       "src": "/api/friends/request",
