@@ -1,39 +1,31 @@
 # Field Naming in Frontend vs Backend
 
 ## Issue
-The frontend and backend have mismatches in field naming conventions:
+We initially thought there was a mismatch between field naming conventions:
 - Frontend uses `name` in the registration form
-- Backend expects `username` in the registration endpoint
+- Backend was expected to use `username` in the registration endpoint
+
+However, after examining the User model, we discovered that:
+- The User model only has a `name` field (not a `username` field)
+- The frontend is correctly sending a `name` field
+- The error occurred because we were trying to set a non-existent `username` field in the database
 
 ## Solution
-A field mapping handler has been created to solve this issue without needing to change the frontend code.
+We've updated the `fixed-register.js` handler to:
+1. Only use the `name` field from the frontend request
+2. Create the user with the appropriate fields that match the User model
+3. Return the response with fields that match the model
 
 ### Implementation
-1. Created `fixed-register.js` in the server/api directory that:
-   - Accepts requests from the frontend with the `name` field
-   - Maps the `name` field to `username` before passing to the backend logic
-   - Returns the appropriate response back to the frontend
-
-2. Updated `vercel.json` to route registration requests to this new handler:
-   ```json
-   {
-     "src": "/api/auth/register",
-     "dest": "/api/fixed-register.js"
-   }
-   ```
+The updated handler:
+- Accepts requests from the frontend with the `name` field
+- Validates and creates a user with the correct fields (`name`, `email`, `password`)
+- Returns the user data in the format expected by the frontend
 
 ## Best Practices Going Forward
 When developing frontend and backend components:
-1. Agree on consistent field naming conventions before development
+1. Ensure that the frontend form field names match the backend model field names
 2. Document API contracts including required field names
 3. Use validation on both ends to ensure data integrity
 4. Consider using TypeScript interfaces/types shared between frontend and backend
-
-## Other Potential Field Mismatches
-Check for similar field naming inconsistencies in other endpoints:
-- Login form
-- Profile update forms
-- Message/chat creation
-- Video call endpoints
-
-If similar issues are found, consider using the same mapping approach or updating the frontend to match the backend expectations.
+5. Always check the database schema before implementing API handlers

@@ -79,16 +79,18 @@ STREAM_API_SECRET=wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevg
 
 ### 1.2 Field Naming in Frontend vs Backend
 
-There is a mismatch between field names in the frontend and backend:
-- Frontend uses `name` in the registration form
-- Backend expects `username` in the registration endpoint
+We initially thought there was a mismatch between field names in the frontend and backend, but after examining the User model, we discovered that:
 
-To handle this without changing the frontend code:
+- The User model has a required `name` field (but no `username` field)
+- The frontend correctly sends a `name` field in the registration form
+- The error occurred because our handler was trying to set a non-existent `username` field
 
-1. A field mapping handler `fixed-register.js` has been created that:
-   - Accepts frontend requests with the `name` field
-   - Maps the `name` field to `username` before processing
-   - Returns the appropriate response to the frontend
+To fix this issue:
+
+1. We've updated the `fixed-register.js` handler to:
+   - Use the `name` field directly from the frontend request
+   - Create a user with fields that match the User model schema
+   - Return a response with fields that match what the frontend expects
 
 2. The `vercel.json` routes have been updated to use this handler:
    ```json

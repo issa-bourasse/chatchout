@@ -41,33 +41,28 @@ async function handler(req, res) {
     
     console.log('Request body:', req.body);
     
-    // Extract fields and handle name/username mapping
+    // Extract fields
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
     
-    // Use name as username if name is provided
-    const username = name || req.body.username;
-    
-    console.log('Processed registration data:', { username, email, password: '***' });
+    console.log('Processed registration data:', { name, email, password: '***' });
     
     // Validate required fields
-    if (!username || !email || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide username, email and password'
+        message: 'Please provide name, email and password'
       });
     }
     
     // Check if user exists
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
-    });
+    const existingUser = await User.findOne({ email });
     
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User with that email or username already exists'
+        message: 'User with that email already exists'
       });
     }
     
@@ -77,7 +72,7 @@ async function handler(req, res) {
     
     // Create user
     const user = await User.create({
-      username,
+      name,
       email,
       password: hashedPassword
     });
@@ -95,9 +90,9 @@ async function handler(req, res) {
       token,
       user: {
         id: user._id,
-        username: user.username,
+        name: user.name,
         email: user.email,
-        profilePicture: user.profilePicture,
+        avatar: user.avatar,
         createdAt: user.createdAt
       }
     });
