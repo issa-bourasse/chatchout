@@ -28,6 +28,10 @@
     {
       "src": "api/session-check.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/friends-debug.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -42,6 +46,10 @@
     {
       "src": "/api/session-check",
       "dest": "/api/session-check.js"
+    },
+    {
+      "src": "/api/friends/debug",
+      "dest": "/api/friends-debug.js"
     },
     {
       "src": "/api/auth/register",
@@ -66,6 +74,34 @@
     {
       "src": "/api/chats",
       "dest": "/api/consolidated-api.js"
+    },
+    {
+      "src": "/api/friends/request",
+      "dest": "/api/consolidated-friends.js"
+    },
+    {
+      "src": "/api/friends/accept",
+      "dest": "/api/consolidated-friends.js"
+    },
+    {
+      "src": "/api/friends/reject",
+      "dest": "/api/consolidated-friends.js"
+    },
+    {
+      "src": "/api/friends/cancel-request",
+      "dest": "/api/consolidated-friends.js"
+    },
+    {
+      "src": "/api/friends/remove",
+      "dest": "/api/consolidated-friends.js"
+    },
+    {
+      "src": "/api/users/me/friends",
+      "dest": "/api/consolidated-friends.js"
+    },
+    {
+      "src": "/api/users/me/friend-requests",
+      "dest": "/api/consolidated-friends.js"
     },
     {
       "src": "/(.*)",

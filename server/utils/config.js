@@ -4,6 +4,7 @@ module.exports = {
   features: {
     videoCall: false, // Disable video call feature
     socket: false,    // Disable socket.io for now until we fix connection issues
+    friends: true,    // Enable friends feature without requiring sockets
   },
   
   // Version info
@@ -13,6 +14,7 @@ module.exports = {
   debug: {
     auth: true,      // Enable auth debugging
     socket: false,   // Disable socket debugging
-    videoCall: false // Disable video call debugging
+    videoCall: false, // Disable video call debugging
+    friends: true    // Enable friends debugging
   }
 };
