@@ -22,7 +22,12 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const checkSocketEnabled = async () => {
       try {
-        const response = await fetch('/api/session-check');
+        // Fix the URL to use the full domain for serverless function
+        const baseUrl = window.location.hostname === 'localhost' 
+          ? '' 
+          : 'https://chatchout-res1.vercel.app';
+          
+        const response = await fetch(`${baseUrl}/api/session-check`);
         const data = await response.json();
         setSocketEnabled(data.config?.features?.socket !== false);
       } catch (err) {

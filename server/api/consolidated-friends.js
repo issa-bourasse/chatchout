@@ -20,6 +20,33 @@ async function connectDB() {
   }
 }
 
+// Helper to parse JSON body for serverless functions
+async function parseBody(req) {
+  return new Promise((resolve) => {
+    if (req.body) {
+      // Body already parsed (e.g. by express)
+      return resolve(req.body);
+    }
+    
+    // For serverless functions that don't use express
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        const parsedBody = body ? JSON.parse(body) : {};
+        req.body = parsedBody;
+        resolve(parsedBody);
+      } catch (e) {
+        console.error('[FriendsAPI] Error parsing request body:', e);
+        req.body = {};
+        resolve({});
+      }
+    });
+  });
+}
+
 /**
  * Combined Friends API handler for multiple endpoints
  */
@@ -36,6 +63,10 @@ async function handler(req, res) {
   }
   
   try {
+    // Parse request body if needed
+    await parseBody(req);
+    console.log(`[FriendsAPI] Request body:`, req.body);
+    
     // Connect to database first (common for all handlers)
     await connectDB();
     
@@ -211,6 +242,7 @@ async function handleAcceptFriendRequest(req, res) {
     const { userId } = req.body;
     const currentUserId = req.user._id;
     
+    console.log('[FriendsAPI] Accept friend request - Body:', req.body);
     console.log('[FriendsAPI] Accept friend request from', userId, 'by', currentUserId);
     
     // Validate user ID

@@ -25,7 +25,12 @@ export const StreamVideoProvider = ({ children }) => {
   useEffect(() => {
     const checkVideoCallEnabled = async () => {
       try {
-        const response = await fetch('/api/session-check');
+        // Fix the URL to use the full domain for serverless function
+        const baseUrl = window.location.hostname === 'localhost' 
+          ? '' 
+          : 'https://chatchout-res1.vercel.app';
+          
+        const response = await fetch(`${baseUrl}/api/session-check`);
         const data = await response.json();
         setVideoCallEnabled(data.config?.features?.videoCall !== false);
       } catch (err) {

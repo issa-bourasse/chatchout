@@ -125,7 +125,10 @@ const ChatApp = () => {
 
   // Accept friend request mutation
   const acceptFriendRequestMutation = useMutation({
-    mutationFn: (userId) => friendsAPI.acceptFriendRequest(userId),
+    mutationFn: (userId) => {
+      console.log('Accepting friend request for user ID:', userId);
+      return friendsAPI.acceptFriendRequest(userId);
+    },
     onSuccess: (response, userId) => {
       queryClient.invalidateQueries(['friends'])
       queryClient.invalidateQueries(['friendRequests'])
@@ -602,12 +605,24 @@ const ChatApp = () => {
 
   // Handle accepting friend request
   const handleAcceptFriendRequest = (user) => {
-    acceptFriendRequestMutation.mutate(user._id)
+    // Fix the issue with id vs _id mismatch
+    const userId = user.id || user._id;
+    if (!userId) {
+      console.error('Failed to accept friend request: Missing user ID', user);
+      return;
+    }
+    acceptFriendRequestMutation.mutate(userId);
   }
 
   // Handle rejecting friend request
   const handleRejectFriendRequest = (user) => {
-    rejectFriendRequestMutation.mutate(user._id)
+    // Fix the issue with id vs _id mismatch
+    const userId = user.id || user._id;
+    if (!userId) {
+      console.error('Failed to reject friend request: Missing user ID', user);
+      return;
+    }
+    rejectFriendRequestMutation.mutate(userId);
   }
 
   // Filter chats based on search term
@@ -889,7 +904,10 @@ const ChatApp = () => {
                       </div>
                       <div className="flex gap-1">
                         <button
-                          onClick={() => handleAcceptFriendRequest(request)}
+                          onClick={() => {
+                            console.log('Accepting friend request:', request);
+                            handleAcceptFriendRequest(request);
+                          }}
                           disabled={acceptFriendRequestMutation.isLoading}
                           className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors disabled:opacity-50"
                         >
