@@ -114,9 +114,11 @@ userSchema.virtual('friendCount').get(function() {
   return this.friends ? this.friends.length : 0;
 });
 
-// Pre-save middleware to hash password
+// Hash password before saving
+// TEMPORARILY DISABLED TO AVOID DOUBLE HASHING
+/*
 userSchema.pre('save', async function(next) {
-  // Only hash the password if it has been modified (or is new)
+  // Only hash the password if it's been modified (or is new)
   if (!this.isModified('password')) return next();
   
   try {
@@ -128,6 +130,7 @@ userSchema.pre('save', async function(next) {
     next(error);
   }
 });
+*/
 
 // Instance method to check password
 userSchema.methods.comparePassword = async function(candidatePassword) {

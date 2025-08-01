@@ -77,9 +77,11 @@ async function handleRegister(req, res) {
   // Extract user data
   const { name, email, password } = req.body;
   console.log('[Register] Registration attempt for email:', email);
+  console.log('[Register] Request body:', JSON.stringify(req.body));
   
   // Validate input
   if (!name || !email || !password) {
+    console.log('[Register] Missing required fields. Name exists:', !!name, 'Email exists:', !!email, 'Password exists:', !!password);
     return res.status(400).json({
       success: false,
       message: 'Name, email, and password are required'
@@ -89,6 +91,8 @@ async function handleRegister(req, res) {
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
+    console.log('[Register] User already exists:', !!existingUser);
+    
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -96,22 +100,45 @@ async function handleRegister(req, res) {
       });
     }
     
-    // Create new user
+    // Create new user object first without saving
     const user = new User({
       name,
       email,
-      password,
+      password: 'placeholder', // Will be replaced with hashed password
       isOnline: true,
       lastSeen: new Date()
     });
     
     // Hash password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    console.log('[Register] Hashing password...');
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      console.log('[Register] Password hashed successfully, length:', hashedPassword.length);
+      console.log('[Register] Password hash sample:', hashedPassword.substring(0, 10) + '...');
+      
+      // Set the hashed password
+      user.password = hashedPassword;
+    } catch (e) {
+      console.error('[Register] Password hashing error:', e.message);
+      return res.status(500).json({
+        success: false,
+        message: 'Error during account creation'
+      });
+    }
     
     // Save user
-    await user.save();
-    console.log('[Register] User registered:', user._id);
+    try {
+      await user.save();
+      console.log('[Register] User registered:', user._id, 'with email:', user.email);
+    } catch (e) {
+      console.error('[Register] User save error:', e.message);
+      return res.status(500).json({
+        success: false,
+        message: 'Error saving user account',
+        error: e.message
+      });
+    }
     
     // Generate JWT token
     const token = jwt.sign(

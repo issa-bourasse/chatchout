@@ -82,9 +82,11 @@ async function handleLogin(req, res) {
   // Extract credentials
   const { email, password } = req.body;
   console.log('[Login] Login attempt for email:', email);
+  console.log('[Login] Request body:', JSON.stringify(req.body));
   
   // Validate input
   if (!email || !password) {
+    console.log('[Login] Missing required fields. Email exists:', !!email, 'Password exists:', !!password);
     return res.status(400).json({
       success: false,
       message: 'Email and password are required'
@@ -94,6 +96,8 @@ async function handleLogin(req, res) {
   try {
     // Find user by email
     const user = await User.findOne({ email });
+    console.log('[Login] User found:', !!user, user ? `ID: ${user._id}` : 'Not found');
+    
     if (!user) {
       console.log('[Login] User not found for email:', email);
       return res.status(400).json({
@@ -102,10 +106,40 @@ async function handleLogin(req, res) {
       });
     }
     
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Verify password using both methods for reliability
+    console.log('[Login] Comparing password...');
+    console.log('[Login] User password hash:', user.password ? user.password.substring(0, 10) + '...' : 'missing');
+    
+    let isMatch = false;
+    
+    // Method 1: Use model's comparePassword method if available
+    if (typeof user.comparePassword === 'function') {
+      try {
+        isMatch = await user.comparePassword(password);
+        console.log('[Login] Password match using model method:', isMatch);
+      } catch (e) {
+        console.error('[Login] Model comparePassword error:', e.message);
+      }
+    }
+    
+    // Method 2: Use direct bcrypt compare as fallback
+    if (!isMatch) {
+      try {
+        isMatch = await bcrypt.compare(password, user.password);
+        console.log('[Login] Password match using direct bcrypt:', isMatch);
+      } catch (e) {
+        console.error('[Login] Bcrypt comparison error:', e.message);
+      }
+    }
+    
     if (!isMatch) {
       console.log('[Login] Password mismatch for email:', email);
+      
+      // For debugging only - REMOVE IN PRODUCTION!
+      const salt = await bcrypt.genSalt(10);
+      const hashedAttempt = await bcrypt.hash(password, salt);
+      console.log('[Login] DEBUG - Attempted password sample hash:', hashedAttempt.substring(0, 10) + '...');
+      
       return res.status(400).json({
         success: false,
         message: 'Invalid credentials'
