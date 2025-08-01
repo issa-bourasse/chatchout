@@ -40,7 +40,17 @@ async function handler(req, res) {
     try {
       console.log('Register request received at direct endpoint:', req.body);
       
-      const { username, email, password } = req.body;
+      // Handle both name and username fields (frontend might send name instead of username)
+      let username = req.body.username;
+      const email = req.body.email;
+      const password = req.body.password;
+      
+      // If frontend sends name instead of username
+      if (!username && req.body.name) {
+        username = req.body.name;
+      }
+
+      console.log('Processed registration data:', { username, email, password: '***' });
 
       // Input validation
       if (!username || !email || !password) {

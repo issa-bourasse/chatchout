@@ -77,7 +77,30 @@ STREAM_API_SECRET=wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevg
    - Wait for deployment to complete
    - Note your backend URL (e.g., `https://chatchout-backend.vercel.app`)
 
-### 1.2 Update CORS Settings
+### 1.2 Field Naming in Frontend vs Backend
+
+There is a mismatch between field names in the frontend and backend:
+- Frontend uses `name` in the registration form
+- Backend expects `username` in the registration endpoint
+
+To handle this without changing the frontend code:
+
+1. A field mapping handler `fixed-register.js` has been created that:
+   - Accepts frontend requests with the `name` field
+   - Maps the `name` field to `username` before processing
+   - Returns the appropriate response to the frontend
+
+2. The `vercel.json` routes have been updated to use this handler:
+   ```json
+   {
+     "src": "/api/auth/register",
+     "dest": "/api/fixed-register.js"
+   }
+   ```
+
+See the [FIELD_NAMING.md](./FIELD_NAMING.md) document for more details on this solution.
+
+### 1.3 Update CORS Settings
 
 After backend deployment, update the CORS configuration in `server/server.js` if needed.
 

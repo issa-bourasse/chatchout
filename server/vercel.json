@@ -17,7 +17,7 @@
     },
     {
       "src": "/api/auth/register",
-      "dest": "/api/direct-register.js"
+      "dest": "/api/fixed-register.js"
     },
     {
       "src": "/(.*)",
