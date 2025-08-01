@@ -214,12 +214,11 @@ async function handleCreatePrivateChat(req, res) {
     const newChat = new Chat({
       type: 'private',
       participants: [
-        { user: req.user._id, role: 'user' },
-        { user: userId, role: 'user' }
+        { user: req.user._id, role: 'member' },
+        { user: userId, role: 'member' }
       ],
-      createdBy: req.user._id,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdBy: req.user._id
+      // timestamps will be added automatically by Mongoose schema
     });
     
     console.log('[ChatsAPI] Saving new chat with participants:', newChat.participants);
