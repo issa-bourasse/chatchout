@@ -120,17 +120,30 @@ async function handleGetChats(req, res) {
     .skip(skip)
     .limit(limit)
     .populate('participants.user', 'name email avatar isOnline lastSeen')
-    .populate('lastMessage');
+    .populate('lastMessage')
+    .lean();  // Convert to plain JavaScript object
     
-    console.log(`[ChatsAPI] Found ${chats.length} chats`);
+    // Format the chats data to include both id and _id
+    const formattedChats = chats.map(chat => ({
+      ...chat,
+      participants: chat.participants.map(p => ({
+        ...p,
+        user: {
+          ...p.user,
+          id: p.user._id
+        }
+      }))
+    }));
+    
+    console.log(`[ChatsAPI] Found ${formattedChats.length} chats`);
     
     return res.status(200).json({
       success: true,
-      chats,
+      chats: formattedChats,
       pagination: {
         page,
         limit,
-        hasMore: chats.length === limit
+        hasMore: formattedChats.length === limit
       }
     });
   } catch (error) {
@@ -199,13 +212,28 @@ async function handleCreatePrivateChat(req, res) {
         { 'participants.user': req.user._id },
         { 'participants.user': userId }
       ]
-    }).populate('participants.user', 'name email avatar isOnline lastSeen');
+    })
+    .populate('participants.user', 'name email avatar isOnline lastSeen')
+    .lean();  // Convert to plain JavaScript object
     
     if (existingChat) {
       console.log('[ChatsAPI] Chat already exists:', existingChat._id);
+      
+      // Format the existing chat data
+      const formattedChat = {
+        ...existingChat,
+        participants: existingChat.participants.map(p => ({
+          ...p,
+          user: {
+            ...p.user,
+            id: p.user._id  // Ensure both id and _id are present
+          }
+        }))
+      };
+      
       return res.status(200).json({
         success: true,
-        chat: existingChat,
+        chat: formattedChat,
         message: 'Chat already exists'
       });
     }
@@ -226,17 +254,42 @@ async function handleCreatePrivateChat(req, res) {
     // Save the new chat
     await newChat.save();
     
-    // Populate the participants
-    const populatedChat = await Chat.findById(newChat._id)
-      .populate('participants.user', 'name email avatar isOnline lastSeen');
-    
-    console.log('[ChatsAPI] New chat created:', newChat._id);
-    
-    return res.status(201).json({
-      success: true,
-      chat: populatedChat,
-      message: 'Private chat created successfully'
-    });
+    try {
+      // Populate the participants
+      const populatedChat = await Chat.findById(newChat._id)
+        .populate('participants.user', 'name email avatar isOnline lastSeen')
+        .lean();  // Convert to plain JavaScript object
+      
+      console.log('[ChatsAPI] New chat created:', newChat._id);
+      
+      // Ensure the populated chat has all required data
+      if (!populatedChat || !populatedChat.participants) {
+        throw new Error('Failed to populate chat data');
+      }
+      
+      // Format the response data
+      const formattedChat = {
+        ...populatedChat,
+        participants: populatedChat.participants.map(p => ({
+          ...p,
+          user: {
+            ...p.user,
+            id: p.user._id  // Ensure both id and _id are present
+          }
+        }))
+      };
+      
+      return res.status(201).json({
+        success: true,
+        chat: formattedChat,
+        message: 'Private chat created successfully'
+      });
+    } catch (populateError) {
+      console.error('[ChatsAPI] Error populating chat:', populateError);
+      // Delete the unpopulated chat to avoid orphaned data
+      await Chat.findByIdAndDelete(newChat._id);
+      throw populateError;
+    }
   } catch (error) {
     console.error('[ChatsAPI] Create private chat error:', error);
     return res.status(500).json({
