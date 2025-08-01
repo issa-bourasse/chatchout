@@ -20,6 +20,10 @@
       "dest": "/api/fixed-register.js"
     },
     {
+      "src": "/api/auth/login",
+      "dest": "/api/fixed-login.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/server.js",
       "headers": {

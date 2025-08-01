@@ -28,8 +28,8 @@ vercel --prod
 
 echo "✅ Deployment complete!"
 echo "📝 Remember to check the following:"
-echo "  1. Verify registration flow works with the updated field handling"
-echo "  2. Test login functionality"
+echo "  1. Verify registration flow works with the fixed handler"
+echo "  2. Test login functionality with the fixed login handler"
 echo "  3. Verify chat and video call features"
 
-echo "🔗 See FIELD_NAMING.md for details on the user field structure"
+echo "🔗 See FIELD_NAMING.md for details on the authentication implementation"

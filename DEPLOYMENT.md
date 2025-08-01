@@ -77,30 +77,33 @@ STREAM_API_SECRET=wap2h4u6wbskauyx7vhaxkvqe6r6pcpf2kqypdfcyg6ty58hhzd3spb83qkevg
    - Wait for deployment to complete
    - Note your backend URL (e.g., `https://chatchout-backend.vercel.app`)
 
-### 1.2 Field Naming in Frontend vs Backend
+### 1.2 Authentication Handlers for Vercel
 
-We initially thought there was a mismatch between field names in the frontend and backend, but after examining the User model, we discovered that:
+We've created specialized serverless function handlers for authentication endpoints:
 
-- The User model has a required `name` field (but no `username` field)
-- The frontend correctly sends a `name` field in the registration form
-- The error occurred because our handler was trying to set a non-existent `username` field
+1. **Registration Handler** (`fixed-register.js`):
+   - The User model has a required `name` field (but no `username` field)
+   - The frontend correctly sends a `name` field in the registration form
+   - Our handler creates users with the proper fields from the model
 
-To fix this issue:
-
-1. We've updated the `fixed-register.js` handler to:
-   - Use the `name` field directly from the frontend request
-   - Create a user with fields that match the User model schema
-   - Return a response with fields that match what the frontend expects
-
-2. The `vercel.json` routes have been updated to use this handler:
+2. **Login Handler** (`fixed-login.js`):
+   - Accepts login requests with email and password
+   - Validates credentials against the database
+   - Returns a properly formatted response with user data and token
+   
+3. **Vercel Routes Configuration**:
    ```json
    {
      "src": "/api/auth/register",
      "dest": "/api/fixed-register.js"
+   },
+   {
+     "src": "/api/auth/login",
+     "dest": "/api/fixed-login.js"
    }
    ```
 
-See the [FIELD_NAMING.md](./FIELD_NAMING.md) document for more details on this solution.
+See the [FIELD_NAMING.md](./FIELD_NAMING.md) document for more details on the user model structure.
 
 ### 1.3 Update CORS Settings
 
