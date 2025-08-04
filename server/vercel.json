@@ -40,6 +40,14 @@
   ],
   "routes": [
     {
+      "src": "/api/messages/([^/]+)",
+      "dest": "/api/consolidated-messages.js"
+    },
+    {
+      "src": "/api/messages",
+      "dest": "/api/consolidated-messages.js"
+    },
+    {
       "src": "/api/cors-test",
       "dest": "/api/cors-test.js"
     },

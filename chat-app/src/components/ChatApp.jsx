@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { MessageService } from '../services/MessageService'
 import { useAuth } from '../App'
 import { useSocket } from '../context/SocketContext'
 import { useStreamVideo } from '../context/StreamVideoContext'
@@ -90,7 +91,7 @@ const ChatApp = () => {
   // Fetch messages for selected chat
   const { data: messages = [], isLoading: messagesLoading, refetch: refetchMessages } = useQuery({
     queryKey: ['messages', selectedChat?._id],
-    queryFn: () => selectedChat ? messagesAPI.getMessages(selectedChat._id).then(res => res.data.messages) : Promise.resolve([]),
+    queryFn: () => selectedChat ? MessageService.getMessages(selectedChat._id).then(res => res.messages) : Promise.resolve([]),
     enabled: !!selectedChat,
   })
 
@@ -396,23 +397,39 @@ const ChatApp = () => {
   }, [showUserInfo])
 
   // Handle sending messages
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault()
-    if (message.trim() && selectedChat && socket && isConnected) {
-      // Send via Socket.IO for real-time delivery
-      const messageType = 'text'
-      const replyTo = replyToMessage?._id || null
+    if (message.trim() && selectedChat) {
+      try {
+        // Send via MessageService for API delivery
+        const messageType = 'text'
+        const replyTo = replyToMessage?._id || null
 
-      sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
-      setMessage('')
-      setReplyToMessage(null)
+        await MessageService.sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
+        
+        // Also send via Socket.IO for real-time delivery if connected
+        if (socket && isConnected) {
+          sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
+        }
+        
+        setMessage('')
+        setReplyToMessage(null)
+        
+        // Stop typing indicator
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+          typingTimeoutRef.current = null
+        }
+        if (socket && isConnected) {
+          socket.stopTyping(selectedChat._id)
+        }
 
-      // Stop typing indicator
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-        typingTimeoutRef.current = null
+        // Refresh messages
+        queryClient.invalidateQueries(['messages', selectedChat._id])
+      } catch (error) {
+        console.error('Error sending message:', error)
+        alert('Failed to send message')
       }
-      socket.stopTyping(selectedChat._id)
     }
   }
 
