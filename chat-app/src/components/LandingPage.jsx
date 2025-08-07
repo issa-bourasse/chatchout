@@ -7,20 +7,20 @@ const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Test API connection
-  const testConnection = async () => {
-    try {
-      console.log('Testing API connection...')
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-      const healthUrl = API_BASE_URL.replace('/api', '') + '/api/health'
-      const response = await fetch(healthUrl)
-      const data = await response.json()
-      console.log('API Health Check:', data)
-      alert(`API Connection: ${data.status} - ${data.message}`)
-    } catch (error) {
-      console.error('API Connection Error:', error)
-      alert('API Connection Failed: ' + error.message)
-    }
-  }
+  // const testConnection = async () => {
+  //   try {
+  //     console.log('Testing API connection...')
+  //     const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  //     const healthUrl = API_BASE_URL.replace('/api', '') + '/api/health'
+  //     const response = await fetch(healthUrl)
+  //     const data = await response.json()
+  //     console.log('API Health Check:', data)
+  //     alert(`API Connection: ${data.status} - ${data.message}`)
+  //   } catch (error) {
+  //     console.error('API Connection Error:', error)
+  //     alert('API Connection Failed: ' + error.message)
+  //   }
+  // }
 
   const features = [
     {
@@ -120,12 +120,6 @@ const LandingPage = () => {
               >
                 Sign In
               </Link>
-              <button
-                onClick={testConnection}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
-              >
-                Test API Connection
-              </button>
             </div>
           </div>
         </div>

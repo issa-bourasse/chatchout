@@ -33,6 +33,16 @@ $vercelConfig = @{
             dest = "/api/messages/[chatId].js"
             methods = @("GET", "OPTIONS")
         }
+        @{
+            src = "/api/api/messages/(.*)"
+            dest = "/api/messages/[chatId].js"
+            methods = @("GET", "OPTIONS")
+        }
+        @{
+            src = "/api/api/messages"
+            dest = "/api/messages.js"
+            methods = @("POST", "OPTIONS")
+        }
     )
 } | ConvertTo-Json -Depth 10
 
@@ -40,7 +50,7 @@ Set-Content -Path "$fixedMessagesDir\vercel.json" -Value $vercelConfig
 
 # Copy the fixed messages API implementations
 Copy-Item -Path ".\server\api\messages\[chatId].js" -Destination "$fixedMessagesDir\api\messages\[chatId].js" -Force
-Copy-Item -Path ".\server\api\fixed-messages-api.js" -Destination "$fixedMessagesDir\api\messages.js" -Force
+Copy-Item -Path ".\server\api\messages.js" -Destination "$fixedMessagesDir\api\messages.js" -Force
 Copy-Item -Path ".\server\api\allowCors.js" -Destination "$fixedMessagesDir\api\allowCors.js" -Force
 
 # Create package.json for the function

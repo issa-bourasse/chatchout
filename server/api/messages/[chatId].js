@@ -86,6 +86,10 @@ async function handler(req, res) {
     if (chatId.includes('?')) {
       chatId = chatId.split('?')[0];
     }
+    
+    console.log('Request URL:', req.url);
+    console.log('Path parts:', parts);
+    console.log('Extracted chatId:', chatId);
 
     // Parse query parameters
     let page = 1;

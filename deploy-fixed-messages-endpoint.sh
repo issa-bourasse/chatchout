@@ -30,6 +30,16 @@ cat > "$fixedMessagesDir/vercel.json" << EOF
       "src": "/api/messages/(.*)",
       "dest": "/api/messages/[chatId].js",
       "methods": ["GET", "OPTIONS"]
+    },
+    {
+      "src": "/api/api/messages/(.*)",
+      "dest": "/api/messages/[chatId].js",
+      "methods": ["GET", "OPTIONS"]
+    },
+    {
+      "src": "/api/api/messages",
+      "dest": "/api/messages.js",
+      "methods": ["POST", "OPTIONS"]
     }
   ]
 }
@@ -37,7 +47,7 @@ EOF
 
 # Copy the fixed messages API implementations
 cp "./server/api/messages/[chatId].js" "$fixedMessagesDir/api/messages/[chatId].js"
-cp "./server/api/fixed-messages-api.js" "$fixedMessagesDir/api/messages.js"
+cp "./server/api/messages.js" "$fixedMessagesDir/api/messages.js"
 cp "./server/api/allowCors.js" "$fixedMessagesDir/api/allowCors.js"
 
 # Create package.json for the function

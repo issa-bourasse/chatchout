@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "functions": {
+    "api/messages/[chatId].js": {
+      "runtime": "nodejs18.x",
+      "memory": 1024
+    },
+    "api/messages.js": {
+      "runtime": "nodejs18.x",
+      "memory": 1024
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/messages",
+      "dest": "/api/messages.js",
+      "methods": ["POST", "OPTIONS"]
+    },
+    {
+      "src": "/api/messages/(.*)",
+      "dest": "/api/messages/[chatId].js",
+      "methods": ["GET", "OPTIONS"]
+    },
+    {
+      "src": "/api/api/messages/(.*)",
+      "dest": "/api/messages/[chatId].js",
+      "methods": ["GET", "OPTIONS"]
+    },
+    {
+      "src": "/api/api/messages",
+      "dest": "/api/messages.js",
+      "methods": ["POST", "OPTIONS"]
+    }
+  ]
+}
