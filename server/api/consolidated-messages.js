@@ -4,8 +4,21 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const Message = require('../models/Message');
 const Chat = require('../models/Chat');
-const { verifyToken } = require('./auth-middleware-new');
+const auth = require('./auth-middleware-new');
 require('dotenv').config();
+
+// Helper function to verify token and get user
+async function verifyToken(req) {
+  try {
+    const authResult = await auth(req, { 
+      status: () => ({ json: () => ({}) }) 
+    });
+    return authResult.success ? authResult.user : null;
+  } catch (error) {
+    console.error('[MessagesAPI] Auth error:', error);
+    return null;
+  }
+}
 
 // Connect to MongoDB if not already connected
 let isConnected = false;
