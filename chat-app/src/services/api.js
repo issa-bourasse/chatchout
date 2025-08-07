@@ -113,8 +113,11 @@ export const chatsAPI = {
 export const messagesAPI = {
   getMessages: (chatId, page = 1, limit = 50) => 
     api.get(`/messages/${chatId}?page=${page}&limit=${limit}`),
-  sendMessage: (chatId, content, type = 'text', replyTo = null) => 
-    api.post('/messages', { chatId, content, type, replyTo }),
+  sendMessage: (chatId, content, type = 'text', replyTo = null) => {
+    const requestBody = { chatId, content, type };
+    if (replyTo) requestBody.replyTo = replyTo;
+    return api.post('/messages', requestBody);
+  },
   markAsRead: (messageId) => api.put(`/messages/${messageId}/read`),
   markMultipleAsRead: (messageIds) => api.put('/messages/read-multiple', { messageIds }),
   addReaction: (messageId, emoji) => api.put(`/messages/${messageId}/react`, { emoji }),

@@ -237,6 +237,9 @@ const Signup = () => {
               <p className="mt-1 text-xs text-gray-500">
                 Password must be at least 6 characters and contain uppercase, lowercase, and number
               </p>
+              <p className="mt-1 text-xs text-blue-600">
+                Example: Password123, MyPass456, SecurePass789
+              </p>
             </div>
 
             {/* Confirm Password Field */}

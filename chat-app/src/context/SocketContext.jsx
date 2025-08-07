@@ -18,39 +18,29 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socketEnabled, setSocketEnabled] = useState(false);
 
-  // Check if socket is enabled from server config
+  // Enable socket for local development, disable for production
   useEffect(() => {
-    const checkSocketEnabled = async () => {
-      try {
-        // Fix the URL to use the full domain for serverless function
-        const baseUrl = window.location.hostname === 'localhost' 
-          ? '' 
-          : 'https://chatchout-res1.vercel.app';
-          
-        const response = await fetch(`${baseUrl}/api/session-check`);
-        const data = await response.json();
-        
-        // In production, force disable sockets since Vercel doesn't support WebSockets
-        if (window.location.hostname !== 'localhost') {
-          console.log('Running in production, WebSockets disabled');
-          setSocketEnabled(false);
-        } else {
-          setSocketEnabled(data.config?.features?.socket !== false);
-        }
-      } catch (err) {
-        console.error('Failed to check socket availability:', err);
+    if (user) {
+      // Enable Socket.IO for localhost (development), disable for production
+      const isLocalhost = window.location.hostname === 'localhost';
+      console.log('🔌 Socket.IO check - hostname:', window.location.hostname, 'isLocalhost:', isLocalhost);
+
+      if (isLocalhost) {
+        console.log('✅ Enabling Socket.IO for local development');
+        setSocketEnabled(true);
+      } else {
+        console.log('❌ Disabling Socket.IO for production (Vercel doesn\'t support WebSockets)');
         setSocketEnabled(false);
       }
-    };
-    
-    if (user) {
-      checkSocketEnabled();
     }
   }, [user]);
 
   useEffect(() => {
     if (user && socketEnabled) {
-      console.log('Socket is enabled, connecting...');
+      console.log('🔌 Socket is enabled, connecting...');
+      console.log('🔌 User:', user.name, 'ID:', user._id);
+      console.log('🔌 Socket URL:', import.meta.env.VITE_SOCKET_URL);
+
       // Connect to socket when user is authenticated
       socketService.connect();
 

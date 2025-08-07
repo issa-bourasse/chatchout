@@ -6,14 +6,14 @@ const { auth, generateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Rate limiting for auth routes
-const authLimiter = rateLimit({
+// Rate limiting for auth routes (disabled in development)
+const authLimiter = process.env.NODE_ENV === 'production' ? rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 requests per windowMs
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) : (req, res, next) => next(); // No rate limiting in development
 
 // Validation rules
 const registerValidation = [

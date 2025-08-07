@@ -115,12 +115,10 @@ userSchema.virtual('friendCount').get(function() {
 });
 
 // Hash password before saving
-// TEMPORARILY DISABLED TO AVOID DOUBLE HASHING
-/*
 userSchema.pre('save', async function(next) {
   // Only hash the password if it's been modified (or is new)
   if (!this.isModified('password')) return next();
-  
+
   try {
     // Hash password with cost of 12
     const salt = await bcrypt.genSalt(12);
@@ -130,7 +128,6 @@ userSchema.pre('save', async function(next) {
     next(error);
   }
 });
-*/
 
 // Instance method to check password
 userSchema.methods.comparePassword = async function(candidatePassword) {

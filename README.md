@@ -96,65 +96,70 @@ FinalProject/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or cloud instance)
-- npm or yarn
+- **Node.js** (v16 or higher) - [Download here](https://nodejs.org/)
+- **MongoDB** (local installation or Atlas account) - See Database Setup section below
+- **npm** (comes with Node.js)
 
-### Installation
+### Quick Start
 
-1. **Clone the repository:**
+1. **Install all dependencies:**
    ```bash
-   git clone <repository-url>
-   cd FinalProject
+   npm run install-all
    ```
 
-2. **Install backend dependencies:**
+2. **Start both servers:**
+   ```bash
+   npm run dev
+   ```
+
+3. **Open the application:**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:5000/api
+
+### Manual Installation
+
+1. **Install backend dependencies:**
    ```bash
    cd server
    npm install
    ```
 
-3. **Install frontend dependencies:**
+2. **Install frontend dependencies:**
    ```bash
-   cd ../chat-app
+   cd chat-app
    npm install
    ```
 
-4. **Configure environment variables:**
-   
-   Create `server/.env`:
-   ```env
-   PORT=5000
-   NODE_ENV=development
-   MONGODB_URI=mongodb://localhost:27017/chatchout
-   JWT_SECRET=your_super_secret_jwt_key_here
-   JWT_EXPIRE=7d
-   CLIENT_URL=http://localhost:5173
-   ```
-
-   Create `chat-app/.env`:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
+3. **Environment files are already configured** for local development:
+   - `server/.env` - Backend configuration
+   - `chat-app/.env` - Frontend configuration
 
 ### Running the Application
 
-1. **Start the backend server:**
+#### Option 1: Start Both Servers Together (Recommended)
+```bash
+npm run dev
+```
+This starts both backend and frontend servers simultaneously.
+
+#### Option 2: Start Servers Separately
+
+1. **Backend server:**
    ```bash
    cd server
    npm run dev
    ```
-   Server will run on http://localhost:5000
+   Server runs on http://localhost:5000
 
-2. **Start the frontend application:**
+2. **Frontend application:**
    ```bash
    cd chat-app
    npm run dev
    ```
-   Frontend will run on http://localhost:5173
+   Frontend runs on http://localhost:5173
 
-3. **Access the application:**
-   Open your browser and navigate to http://localhost:5173
+#### Access the Application
+Open your browser and navigate to **http://localhost:5173**
 
 ## 🧪 Testing the Application
 
@@ -211,60 +216,30 @@ cd chat-app
 npm run build
 ```
 
-## 🚀 Deployment to Vercel
+## 🗄️ Database Configuration
 
-### Optimized for Vercel Serverless
+### Current Setup: MongoDB Atlas (Cloud Database)
 
-ChatChout is optimized for deployment to Vercel's serverless platform.
+The application is **pre-configured** to use a MongoDB Atlas cloud database, so **no additional database setup is required**!
 
-#### Function Limit Solution
+- ✅ **Database**: MongoDB Atlas (cloud)
+- ✅ **Connection**: Already configured in `server/.env`
+- ✅ **Ready to use**: Just start the servers and begin chatting
 
-Vercel's Hobby plan has a 12 serverless function limit. To work within this constraint, the API is organized using consolidated handlers:
+### Alternative: Local MongoDB (Optional)
 
-1. **Consolidated Handlers**: Multiple API endpoints are combined into single handler files
-   - `consolidated-api.js`: Handles login, logout, user search, and chats list
-   - `consolidated-auth.js`: Handles registration and authentication testing
+If you prefer to use a local MongoDB instance:
 
-2. **Utility Files**:
-   - `auth-middleware-new.js`: Authentication middleware
-   - `allowCors.js`: CORS support for serverless functions
+1. **Install MongoDB Community Edition** from [mongodb.com](https://www.mongodb.com/try/download/community)
+2. **Start MongoDB service**
+3. **Update `server/.env`**:
+   ```env
+   # Comment out Atlas URI:
+   # MONGODB_URI=mongodb+srv://admin:admin12345$@cluster0.sbge678.mongodb.net/chatchout?retryWrites=true&w=majority&appName=Cluster0
 
-3. **Deployment Tools**:
-   - `deploy.sh` / `deploy.ps1`: Deployment scripts that check function count
-   - `cleanup-vercel-functions.sh` / `cleanup-vercel-functions.ps1`: Scripts to archive unused functions
-
-For detailed information on the deployment solution, see [VERCEL_FUNCTION_LIMIT.md](VERCEL_FUNCTION_LIMIT.md).
-
-### Deployment Steps
-
-1. **Clean up unused functions** (if needed):
-   ```bash
-   # Linux/Mac
-   bash cleanup-vercel-functions.sh
-   
-   # Windows
-   .\cleanup-vercel-functions.ps1
+   # Uncomment local URI:
+   MONGODB_URI=mongodb://localhost:27017/chatchout
    ```
-
-2. **Deploy to Vercel**:
-   ```bash
-   # Linux/Mac
-   bash deploy.sh
-   
-   # Windows
-   .\deploy.ps1
-   ```
-
-3. **Test API endpoints**:
-   ```bash
-   # Linux/Mac
-   bash test-api.sh
-   
-   # Windows
-   .\test-api.ps1
-   ```
-
-For complete deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## 🌟 Features in Detail
 

@@ -1,3 +1,5 @@
+console.log('🚀 Starting ChatChout server...');
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -6,6 +8,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 require('dotenv').config();
+
+console.log('📦 Dependencies loaded successfully');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -42,23 +46,39 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // CORS configuration
-app.use(cors({
-  origin: '*', // Allow all origins temporarily for testing
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.CLIENT_URL, process.env.CORS_ORIGIN].filter(Boolean)
+    : '*', // Allow all origins in development
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+console.log('🔒 CORS configuration:', corsOptions);
+app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chatchout')
-.then(() => {
-  console.log('✅ Connected to MongoDB');
+console.log('🔄 Attempting to connect to MongoDB...');
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/chatchout';
+console.log(`📍 MongoDB URI: ${mongoUri.replace(/\/\/.*@/, '//***:***@')}`); // Hide credentials in logs
+
+mongoose.connect(mongoUri, {
+  serverSelectionTimeoutMS: 10000, // 10 second timeout
+  socketTimeoutMS: 45000,
 })
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+.then(() => {
+  console.log('✅ Connected to MongoDB successfully');
+})
+.catch((err) => {
+  console.error('❌ MongoDB connection error:', err.message);
+  console.log('⚠️  Server will continue without database connection');
+  console.log('💡 To use local MongoDB: Install MongoDB locally or use MongoDB Atlas');
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -78,7 +98,16 @@ app.get('/api/health', (req, res) => {
 });
 
 // Socket.IO connection handling
+console.log('🔌 Setting up Socket.IO handlers...');
 socketHandler(io);
+
+// Add debugging for Socket.IO connections
+io.engine.on("connection_error", (err) => {
+  console.log('❌ Socket.IO connection error:', err.req);
+  console.log('❌ Error code:', err.code);
+  console.log('❌ Error message:', err.message);
+  console.log('❌ Error context:', err.context);
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -96,14 +125,12 @@ app.use('*', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`🌐 Client URL: ${process.env.CLIENT_URL || "http://localhost:5173"}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
-}
-
-// Export for Vercel serverless deployment
-module.exports = app;
+// Start the server
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Client URL: ${process.env.CLIENT_URL || "http://localhost:5173"}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`💾 Database: ${process.env.MONGODB_URI ? 'Connected' : 'Not configured'}`);
+  console.log(`🔌 Socket.IO: Enabled`);
+  console.log('✅ ChatChout server is ready!');
+});

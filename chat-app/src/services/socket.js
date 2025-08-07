@@ -11,14 +11,17 @@ class SocketService {
   connect() {
     const token = getAuthToken();
     if (!token) {
-      console.error('No auth token found');
+      console.error('❌ No auth token found for Socket.IO');
       return;
     }
 
     // Use dedicated Socket URL if available, otherwise fallback to API URL without /api
-    const serverUrl = import.meta.env.VITE_SOCKET_URL || 
-                      import.meta.env.VITE_API_URL?.replace('/api', '') || 
+    const serverUrl = import.meta.env.VITE_SOCKET_URL ||
+                      import.meta.env.VITE_API_URL?.replace('/api', '') ||
                       'http://localhost:5000';
+
+    console.log('🔌 Connecting to Socket.IO server:', serverUrl);
+    console.log('🔌 Using token:', token.substring(0, 20) + '...');
 
     this.socket = io(serverUrl, {
       auth: {
@@ -26,6 +29,8 @@ class SocketService {
       },
       transports: ['websocket', 'polling']
     });
+
+    console.log('🔌 Socket.IO instance created');
 
     this.socket.on('connect', () => {
       console.log('✅ Connected to server');

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { MessageService } from '../services/MessageService'
 import { useAuth } from '../App'
@@ -44,10 +45,34 @@ const ChatApp = () => {
   const { user, logout } = useAuth()
   const { socket, isConnected, onlineUsers, joinChat, leaveChat, sendMessage } = useSocket()
   const { createCall, isInitialized: isVideoInitialized, error: videoError } = useStreamVideo()
+  const navigate = useNavigate()
 
   // Debug video initialization
   console.log('🎥 Video initialized:', isVideoInitialized, 'Error:', videoError)
   const queryClient = useQueryClient()
+
+  // Check if user is authenticated
+  useEffect(() => {
+    if (!user) {
+      console.log('User not authenticated, redirecting to login');
+      navigate('/login');
+      return;
+    }
+    console.log('User authenticated:', user);
+  }, [user, navigate]);
+
+  // Early return if no user
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading user data...</p>
+          <p className="text-sm text-gray-500 mt-2">If this takes too long, you may need to log in again.</p>
+        </div>
+      </div>
+    )
+  }
 
   const [selectedChat, setSelectedChat] = useState(null)
   const [message, setMessage] = useState('')
@@ -401,22 +426,27 @@ const ChatApp = () => {
     e.preventDefault()
     if (message.trim() && selectedChat) {
       try {
-        console.log('Sending message via API...');
-        // Send via MessageService for API delivery
+        console.log('Sending message...');
+        console.log('User:', user);
+        console.log('Selected chat:', selectedChat);
+        console.log('Socket connected:', socket && isConnected);
+
         const messageType = 'text'
         const replyTo = replyToMessage?._id || null
 
-        await MessageService.sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
-        
-        // Also send via Socket.IO for real-time delivery if connected
+        // Use Socket.IO if connected, otherwise fallback to API
         if (socket && isConnected) {
-          console.log('Socket connected, sending via socket too');
+          console.log('✅ Sending via Socket.IO (real-time)');
           sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
+          // Show success message for Socket.IO
+          console.log('📡 Message sent via Socket.IO - real-time delivery');
         } else {
-          console.log('Socket not connected, refreshing via query invalidation');
-          // If socket is not connected, manually refresh messages
+          console.log('⚠️ Socket not connected, sending via API');
+          await MessageService.sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
+          // Refresh messages since we're not getting real-time updates
           queryClient.invalidateQueries(['messages', selectedChat._id])
           queryClient.invalidateQueries(['chats'])
+          console.log('📤 Message sent via API - manual refresh triggered');
         }
         
         setMessage('')
@@ -438,7 +468,25 @@ const ChatApp = () => {
         console.log('Message sent successfully');
       } catch (error) {
         console.error('Error sending message:', error)
-        alert('Failed to send message: ' + (error.response?.data?.error || error.message || 'Unknown error'))
+
+        // More detailed error handling
+        let errorMessage = 'Failed to send message: ';
+        if (error.response?.status === 401) {
+          errorMessage += 'You are not logged in. Please log in again.';
+          // Redirect to login
+          navigate('/login');
+        } else if (error.response?.status === 400) {
+          errorMessage += error.response?.data?.message || 'Invalid message data';
+          console.error('Validation errors:', error.response?.data?.errors);
+        } else if (error.response?.status === 404) {
+          errorMessage += 'Chat not found. Please try creating a new chat with this friend.';
+        } else if (error.response?.status === 403) {
+          errorMessage += 'You do not have permission to send messages to this chat.';
+        } else {
+          errorMessage += error.response?.data?.error || error.message || 'Unknown error';
+        }
+
+        alert(errorMessage)
       }
     }
   }
@@ -1065,6 +1113,20 @@ const ChatApp = () => {
               <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-sm">No chats yet</p>
               <p className="text-gray-400 text-xs mt-1">Add friends to start chatting!</p>
+              <div className="mt-4 space-y-2">
+                <button
+                  onClick={() => setShowUserSearch(true)}
+                  className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                >
+                  Find Friends
+                </button>
+                <button
+                  onClick={() => setShowFriendRequests(true)}
+                  className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                >
+                  Check Friend Requests
+                </button>
+              </div>
             </div>
           ) : (
             filteredChats.map((chat) => (
@@ -1135,19 +1197,25 @@ const ChatApp = () => {
                 />
                 <div>
                   <h3 className="font-semibold text-gray-900">{getChatDisplayName(selectedChat)}</h3>
-                  <p className="text-sm text-gray-500">
-                    {selectedChat.type === 'group'
-                      ? `${selectedChat.participants?.length || 0} members`
-                      : isChatOnline(selectedChat)
-                        ? 'Online'
-                        : 'Offline'
-                    }
-                    {typingUsers.size > 0 && (
-                      <span className="text-blue-600 ml-2">
-                        {typingUsers.size === 1 ? 'typing...' : `${typingUsers.size} people typing...`}
-                      </span>
-                    )}
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm text-gray-500">
+                      {selectedChat.type === 'group'
+                        ? `${selectedChat.participants?.length || 0} members`
+                        : isChatOnline(selectedChat)
+                          ? 'Online'
+                          : 'Offline'
+                      }
+                      {typingUsers.size > 0 && (
+                        <span className="text-blue-600 ml-2">
+                          {typingUsers.size === 1 ? 'typing...' : `${typingUsers.size} people typing...`}
+                        </span>
+                      )}
+                    </p>
+                    <div
+                      className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-orange-500'}`}
+                      title={isConnected ? 'Real-time messaging (Socket.IO)' : 'Standard messaging (API)'}
+                    ></div>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center space-x-2">

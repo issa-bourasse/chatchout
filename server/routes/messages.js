@@ -83,9 +83,13 @@ router.post('/', auth, [
     .withMessage('Invalid reply message ID')
 ], async (req, res) => {
   try {
+    console.log('📨 POST /messages - Request body:', req.body);
+    console.log('👤 User:', req.user?._id);
+
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         message: 'Validation failed',
         errors: errors.array()
