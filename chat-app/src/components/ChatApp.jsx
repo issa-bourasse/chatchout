@@ -401,6 +401,7 @@ const ChatApp = () => {
     e.preventDefault()
     if (message.trim() && selectedChat) {
       try {
+        console.log('Sending message via API...');
         // Send via MessageService for API delivery
         const messageType = 'text'
         const replyTo = replyToMessage?._id || null
@@ -409,8 +410,10 @@ const ChatApp = () => {
         
         // Also send via Socket.IO for real-time delivery if connected
         if (socket && isConnected) {
+          console.log('Socket connected, sending via socket too');
           sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
         } else {
+          console.log('Socket not connected, refreshing via query invalidation');
           // If socket is not connected, manually refresh messages
           queryClient.invalidateQueries(['messages', selectedChat._id])
           queryClient.invalidateQueries(['chats'])
@@ -430,9 +433,12 @@ const ChatApp = () => {
 
         // Refresh messages
         queryClient.invalidateQueries(['messages', selectedChat._id])
+        
+        // Show visual feedback that message was sent successfully
+        console.log('Message sent successfully');
       } catch (error) {
         console.error('Error sending message:', error)
-        alert('Failed to send message')
+        alert('Failed to send message: ' + (error.response?.data?.error || error.message || 'Unknown error'))
       }
     }
   }

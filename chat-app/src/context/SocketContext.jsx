@@ -29,7 +29,14 @@ export const SocketProvider = ({ children }) => {
           
         const response = await fetch(`${baseUrl}/api/session-check`);
         const data = await response.json();
-        setSocketEnabled(data.config?.features?.socket !== false);
+        
+        // In production, force disable sockets since Vercel doesn't support WebSockets
+        if (window.location.hostname !== 'localhost') {
+          console.log('Running in production, WebSockets disabled');
+          setSocketEnabled(false);
+        } else {
+          setSocketEnabled(data.config?.features?.socket !== false);
+        }
       } catch (err) {
         console.error('Failed to check socket availability:', err);
         setSocketEnabled(false);
