@@ -3,7 +3,7 @@ module.exports = {
   // Feature flags
   features: {
     videoCall: false, // Disable video call feature
-    socket: false,    // Disable socket.io for now until we fix connection issues
+    socket: true,     // Enable socket.io for real-time messaging
     friends: true,    // Enable friends feature without requiring sockets
   },
   

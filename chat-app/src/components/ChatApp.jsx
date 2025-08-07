@@ -410,6 +410,10 @@ const ChatApp = () => {
         // Also send via Socket.IO for real-time delivery if connected
         if (socket && isConnected) {
           sendMessage(selectedChat._id, message.trim(), messageType, replyTo)
+        } else {
+          // If socket is not connected, manually refresh messages
+          queryClient.invalidateQueries(['messages', selectedChat._id])
+          queryClient.invalidateQueries(['chats'])
         }
         
         setMessage('')
@@ -1607,12 +1611,10 @@ const ChatApp = () => {
                     placeholder={
                       !selectedChat
                         ? "Select a chat to start messaging..."
-                        : !isConnected
-                          ? "Connecting..."
-                          : "Type a message..."
+                        : "Type a message..."
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    disabled={!isConnected || !selectedChat}
+                    disabled={!selectedChat}
                   />
                   <button
                     type="button"
@@ -1623,7 +1625,7 @@ const ChatApp = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={!message.trim() || !selectedChat || !isConnected}
+                  disabled={!message.trim() || !selectedChat}
                   className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Send className="w-5 h-5" />
