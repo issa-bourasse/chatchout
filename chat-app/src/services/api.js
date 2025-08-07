@@ -7,9 +7,14 @@ const determineBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // In production, check domain and use appropriate API URL
-  if (window.location.hostname === 'chatchout.vercel.app') {
-    return 'https://chatchout-res1.vercel.app/api';
+  // In production, use the current hostname with the proper API endpoint
+  if (window.location.hostname !== 'localhost') {
+    // Extract the deployment hostname from current URL
+    const hostname = window.location.hostname.includes('vercel.app') 
+      ? 'chatchout-res1.vercel.app' // Default backend
+      : window.location.hostname.replace('www.', '');
+    
+    return `https://${hostname}/api`;
   }
   
   // Default for local development

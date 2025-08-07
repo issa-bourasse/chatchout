@@ -4,7 +4,7 @@ export const MessageService = {
   // Get messages for a specific chat
   getMessages: async (chatId) => {
     try {
-      const response = await api.get(`/api/messages/${chatId}`);
+      const response = await api.get(`/messages/${chatId}`);
       return response.data;
     } catch (error) {
       console.error('Error getting messages:', error);
@@ -15,7 +15,7 @@ export const MessageService = {
   // Send a new message
   sendMessage: async (chatId, content, type = 'text', replyTo = null) => {
     try {
-      const response = await api.post('/api/messages', {
+      const response = await api.post('/messages', {
         chatId,
         content,
         type,
