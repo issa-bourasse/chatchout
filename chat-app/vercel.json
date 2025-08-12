@@ -1,46 +1,10 @@
 {
-  "version": 2,
-  "name": "chatchout-frontend",
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "env": {
-    "VITE_API_URL": "@vite_api_url",
-    "VITE_SOCKET_URL": "@vite_socket_url",
-    "VITE_STREAM_API_KEY": "@vite_stream_api_key",
-    "VITE_APP_NAME": "ChatChout",
-    "VITE_APP_VERSION": "1.0.0",
-    "VITE_ENABLE_NOTIFICATIONS": "true",
-    "VITE_ENABLE_VIDEO_CALLS": "true",
-    "VITE_DEBUG": "false",
-    "VITE_NODE_ENV": "production"
-  },
-  "build": {
-    "env": {
-      "VITE_API_URL": "@vite_api_url",
-      "VITE_SOCKET_URL": "@vite_socket_url",
-      "VITE_STREAM_API_KEY": "@vite_stream_api_key",
-      "VITE_APP_NAME": "ChatChout",
-      "VITE_APP_VERSION": "1.0.0",
-      "VITE_ENABLE_NOTIFICATIONS": "true",
-      "VITE_ENABLE_VIDEO_CALLS": "true",
-      "VITE_DEBUG": "false",
-      "VITE_NODE_ENV": "production"
-    }
-  },
-  "functions": {},
   "headers": [
     {
       "source": "/(.*)",
