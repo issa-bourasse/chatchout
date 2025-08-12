@@ -24,14 +24,32 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production'
-      ? [
-          process.env.CLIENT_URL,
-          process.env.CORS_ORIGIN,
-          'https://chatchout.vercel.app',
-          'https://chatchout-three.vercel.app'
-        ].filter(Boolean)
-      : '*', // Allow all origins in development
+    origin: (origin, callback) => {
+      // Allow requests with no origin
+      if (!origin) return callback(null, true);
+
+      if (process.env.NODE_ENV === 'development') {
+        return callback(null, true);
+      }
+
+      // Production allowed origins
+      const allowedOrigins = [
+        process.env.CLIENT_URL,
+        process.env.CORS_ORIGIN,
+        'https://chatchout.vercel.app',
+        'https://chatchout-three.vercel.app'
+      ].filter(Boolean);
+
+      // Also allow any vercel.app subdomain for this project
+      const isVercelApp = origin.includes('chatchout') && origin.includes('vercel.app');
+
+      if (allowedOrigins.includes(origin) || isVercelApp) {
+        callback(null, true);
+      } else {
+        console.log(`❌ Socket.IO CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -54,16 +72,35 @@ if (process.env.NODE_ENV === 'production') {
   app.use('/api/', limiter);
 }
 
-// CORS configuration
+// CORS configuration with dynamic origin checking
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? [
-        process.env.CLIENT_URL,
-        process.env.CORS_ORIGIN,
-        'https://chatchout.vercel.app',
-        'https://chatchout-three.vercel.app'
-      ].filter(Boolean)
-    : '*', // Allow all origins in development
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+
+    // Production allowed origins
+    const allowedOrigins = [
+      process.env.CLIENT_URL,
+      process.env.CORS_ORIGIN,
+      'https://chatchout.vercel.app',
+      'https://chatchout-three.vercel.app'
+    ].filter(Boolean);
+
+    // Also allow any vercel.app subdomain for this project
+    const isVercelApp = origin.includes('chatchout') && origin.includes('vercel.app');
+
+    if (allowedOrigins.includes(origin) || isVercelApp) {
+      callback(null, true);
+    } else {
+      console.log(`❌ CORS blocked origin: ${origin}`);
+      console.log(`✅ Allowed origins: ${allowedOrigins.join(', ')}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

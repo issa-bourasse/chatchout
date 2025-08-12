@@ -25,16 +25,18 @@ const VideoCall = () => {
     const initializeCall = async () => {
       // Check if video calls are enabled from server config
       try {
-        const response = await fetch('/api/session-check');
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE_URL}/video-calls/config`);
         const data = await response.json();
-        
-        if (!data.config?.features?.videoCall) {
+
+        if (!data.success) {
           setError('Video calling is currently disabled');
           setIsLoading(false);
           return;
         }
       } catch (err) {
         console.error('Failed to check video call availability:', err);
+        // Continue anyway - video calls might still work
       }
       
       if (!isInitialized) {

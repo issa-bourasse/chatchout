@@ -2,23 +2,19 @@ import axios from 'axios';
 
 // Determine the base URL based on the environment
 const determineBaseUrl = () => {
-  // First try environment variable
+  // First try environment variable (this should always be set in production)
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  
-  // In production, use the current hostname with the proper API endpoint
-  if (window.location.hostname !== 'localhost') {
-    // Extract the deployment hostname from current URL
-    const hostname = window.location.hostname.includes('vercel.app') 
-      ? 'chatchout-res1.vercel.app' // Default backend
-      : window.location.hostname.replace('www.', '');
-    
-    return `https://${hostname}/api`;
+
+  // Fallback for local development
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:5000/api';
   }
-  
-  // Default for local development
-  return 'http://localhost:5000/api';
+
+  // If no environment variable is set in production, show error
+  console.error('❌ VITE_API_URL environment variable not set!');
+  throw new Error('API URL not configured. Please set VITE_API_URL environment variable.');
 };
 
 const API_BASE_URL = determineBaseUrl();
