@@ -20,9 +20,12 @@ class SocketService {
       return;
     }
 
-    // Don't attempt WebSocket connection in production environment
-    if (window.location.hostname !== 'localhost') {
-      console.log('In production environment - using polling fallback instead of WebSockets');
+    // Check if we have a socket URL configured for production (Railway)
+    const hasSocketUrl = import.meta.env.VITE_SOCKET_URL;
+    const isLocalhost = window.location.hostname === 'localhost';
+
+    if (!isLocalhost && !hasSocketUrl) {
+      console.log('No socket URL configured - using polling fallback instead of WebSockets');
       this.setupPolling();
       return;
     }

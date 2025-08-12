@@ -41,7 +41,9 @@ CORS_ORIGIN=https://your-vercel-app.vercel.app
 
 ### 1.4 Get Railway URL
 After deployment, Railway will give you a URL like:
-`https://your-app-name.railway.app`
+`https://your-app-name.up.railway.app`
+
+**⚠️ IMPORTANT**: Railway URLs now use `.up.railway.app` domain!
 
 ## 🌐 **Step 2: Update Frontend Environment**
 
@@ -49,16 +51,18 @@ After deployment, Railway will give you a URL like:
 In your Vercel dashboard → Project → Settings → Environment Variables:
 
 ```env
-VITE_API_URL=https://your-railway-app.railway.app/api
-VITE_SOCKET_URL=https://your-railway-app.railway.app
+VITE_API_URL=https://your-railway-app.up.railway.app/api
+VITE_SOCKET_URL=https://your-railway-app.up.railway.app
 VITE_STREAM_API_KEY=twe26yayd39n
 VITE_APP_NAME=ChatChout
 VITE_APP_VERSION=1.0.0
 VITE_ENABLE_NOTIFICATIONS=true
 VITE_ENABLE_VIDEO_CALLS=true
+VITE_DEBUG=false
+VITE_NODE_ENV=production
 ```
 
-**⚠️ IMPORTANT**: Replace `https://your-railway-app.railway.app` with your actual Railway URL!
+**⚠️ IMPORTANT**: Replace `https://your-railway-app.up.railway.app` with your actual Railway URL!
 
 ### 2.2 Redeploy Frontend
 After updating environment variables, redeploy your Vercel app to apply changes.
@@ -66,7 +70,7 @@ After updating environment variables, redeploy your Vercel app to apply changes.
 ## ✅ **Step 3: Verify Deployment**
 
 ### 3.1 Test Backend
-Visit: `https://your-railway-app.railway.app/api/health`
+Visit: `https://your-railway-app.up.railway.app/api/health`
 Should return: `{"status":"OK","message":"ChatChout server is running"}`
 
 ### 3.2 Test Frontend
@@ -115,7 +119,8 @@ After successful deployment:
 ## 🎯 **URLs Summary**
 ```
 Frontend: https://your-vercel-app.vercel.app
-Backend:  https://your-railway-app.railway.app
-API:      https://your-railway-app.railway.app/api
-Health:   https://your-railway-app.railway.app/api/health
+Backend:  https://your-railway-app.up.railway.app
+API:      https://your-railway-app.up.railway.app/api
+Health:   https://your-railway-app.up.railway.app/api/health
+Socket:   wss://your-railway-app.up.railway.app (WebSocket support!)
 ```

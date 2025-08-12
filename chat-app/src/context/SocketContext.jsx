@@ -18,18 +18,21 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socketEnabled, setSocketEnabled] = useState(false);
 
-  // Enable socket for local development, disable for production
+  // Enable socket for development and production (Railway supports WebSockets)
   useEffect(() => {
     if (user) {
-      // Enable Socket.IO for localhost (development), disable for production
       const isLocalhost = window.location.hostname === 'localhost';
-      console.log('🔌 Socket.IO check - hostname:', window.location.hostname, 'isLocalhost:', isLocalhost);
+      const hasSocketUrl = import.meta.env.VITE_SOCKET_URL;
 
-      if (isLocalhost) {
-        console.log('✅ Enabling Socket.IO for local development');
+      console.log('🔌 Socket.IO check - hostname:', window.location.hostname);
+      console.log('🔌 Socket URL configured:', hasSocketUrl);
+
+      // Enable sockets if we're in localhost OR if we have a socket URL configured (Railway)
+      if (isLocalhost || hasSocketUrl) {
+        console.log('✅ Enabling Socket.IO - Railway backend supports WebSockets');
         setSocketEnabled(true);
       } else {
-        console.log('❌ Disabling Socket.IO for production (Vercel doesn\'t support WebSockets)');
+        console.log('❌ Disabling Socket.IO - No socket URL configured');
         setSocketEnabled(false);
       }
     }

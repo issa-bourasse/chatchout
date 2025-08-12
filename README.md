@@ -2,6 +2,21 @@
 
 A modern, real-time chat application built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring friend systems, group chats, and real-time messaging.
 
+## 🌐 Deployment Architecture
+
+```
+Frontend (React + Vite) → Vercel (Static Hosting + CDN)
+Backend (Node.js + Socket.IO) → Railway (WebSocket Support)
+Database → MongoDB Atlas (Cloud Database)
+```
+
+**Why this architecture?**
+- ✅ **Vercel**: Perfect for React apps, global CDN, automatic HTTPS, free tier
+- ✅ **Railway**: Supports WebSockets for real-time features, easy deployment, free tier
+- ✅ **MongoDB Atlas**: Managed database, reliable and scalable, free tier
+
+**Socket.IO Support**: Unlike Vercel's serverless functions, Railway provides persistent connections needed for WebSocket/Socket.IO real-time features.
+
 ## 🏗️ Project Structure
 
 ```
@@ -258,6 +273,59 @@ If you prefer to use a local MongoDB instance:
 - 🔐 CORS protection
 - 🛡️ Input validation
 - 🔒 Protected routes
+
+## 🚀 Production Deployment
+
+### Quick Deployment Guide
+
+1. **Deploy Backend to Railway**:
+   ```bash
+   # See RAILWAY_DEPLOYMENT.md for detailed steps
+   ```
+
+2. **Deploy Frontend to Vercel**:
+   ```bash
+   # See VERCEL_DEPLOYMENT.md for detailed steps
+   ```
+
+3. **Test Deployment**:
+   ```bash
+   node test-deployment.js <railway-url> <vercel-url>
+   ```
+
+### Deployment Files
+
+- 📋 **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Complete deployment overview
+- 🚂 **[RAILWAY_DEPLOYMENT.md](RAILWAY_DEPLOYMENT.md)** - Railway backend deployment
+- 🌐 **[VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)** - Vercel frontend deployment
+- 🔧 **[ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)** - Environment variables guide
+- 🧪 **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Testing deployed application
+- 🛠️ **[deploy.sh](deploy.sh)** - Automated deployment script
+
+### Environment Variables
+
+**Railway (Backend)**:
+```env
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=your_secret_key
+CLIENT_URL=https://your-vercel-app.vercel.app
+```
+
+**Vercel (Frontend)**:
+```env
+VITE_API_URL=https://your-railway-app.up.railway.app/api
+VITE_SOCKET_URL=https://your-railway-app.up.railway.app
+```
+
+### Deployment Architecture Benefits
+
+- 🌍 **Global CDN**: Vercel provides worldwide content delivery
+- ⚡ **Real-time Support**: Railway enables WebSocket connections
+- 💰 **Cost Effective**: Both platforms offer generous free tiers
+- 🔄 **Auto Deployment**: Git-based automatic deployments
+- 📊 **Monitoring**: Built-in analytics and logging
+- 🔒 **Security**: Automatic HTTPS and security headers
 
 ## 🤝 Contributing
 

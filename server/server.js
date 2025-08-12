@@ -25,13 +25,20 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production'
-      ? [process.env.CLIENT_URL, 'https://chatchout.vercel.app'].filter(Boolean)
+      ? [
+          process.env.CLIENT_URL,
+          process.env.CORS_ORIGIN,
+          'https://chatchout.vercel.app',
+          'https://*.vercel.app'
+        ].filter(Boolean)
       : '*', // Allow all origins in development
     methods: ["GET", "POST"],
     credentials: true
   },
   transports: ['websocket', 'polling'],
-  allowEIO3: true
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Security middleware
@@ -50,7 +57,12 @@ if (process.env.NODE_ENV === 'production') {
 // CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? [process.env.CLIENT_URL, process.env.CORS_ORIGIN, 'https://chatchout.vercel.app'].filter(Boolean)
+    ? [
+        process.env.CLIENT_URL,
+        process.env.CORS_ORIGIN,
+        'https://chatchout.vercel.app',
+        'https://*.vercel.app'
+      ].filter(Boolean)
     : '*', // Allow all origins in development
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
