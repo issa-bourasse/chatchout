@@ -29,7 +29,7 @@ const io = socketIo(server, {
           process.env.CLIENT_URL,
           process.env.CORS_ORIGIN,
           'https://chatchout.vercel.app',
-          'https://*.vercel.app'
+          'https://chatchout-three.vercel.app'
         ].filter(Boolean)
       : '*', // Allow all origins in development
     methods: ["GET", "POST"],
@@ -61,7 +61,7 @@ const corsOptions = {
         process.env.CLIENT_URL,
         process.env.CORS_ORIGIN,
         'https://chatchout.vercel.app',
-        'https://*.vercel.app'
+        'https://chatchout-three.vercel.app'
       ].filter(Boolean)
     : '*', // Allow all origins in development
   credentials: true,
