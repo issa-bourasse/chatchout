@@ -24,7 +24,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: '*', // Allow all origins temporarily for testing
+    origin: process.env.NODE_ENV === 'production'
+      ? [process.env.CLIENT_URL, 'https://chatchout.vercel.app'].filter(Boolean)
+      : '*', // Allow all origins in development
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -48,7 +50,7 @@ if (process.env.NODE_ENV === 'production') {
 // CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? [process.env.CLIENT_URL, process.env.CORS_ORIGIN].filter(Boolean)
+    ? [process.env.CLIENT_URL, process.env.CORS_ORIGIN, 'https://chatchout.vercel.app'].filter(Boolean)
     : '*', // Allow all origins in development
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
